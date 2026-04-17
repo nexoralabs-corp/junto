@@ -12,6 +12,29 @@ export type SchedulerState = {
 export const HOURS = Array.from({ length: 14 }, (_, i) => i + 8) // 8..21
 export const NUM_DAYS = 7
 
+// Palette: all dark enough for white text (≥4.5:1 contrast)
+export const PARTICIPANT_COLORS = [
+  '#0D9488', // teal-600
+  '#6D28D9', // violet-700
+  '#C2410C', // orange-700
+  '#1D4ED8', // blue-700
+  '#BE185D', // pink-700
+  '#15803D', // green-700
+  '#92400E', // amber-800
+  '#0E7490', // cyan-700
+] as const
+
+export function participantColor(idx: number): string {
+  return PARTICIPANT_COLORS[idx % PARTICIPANT_COLORS.length]
+}
+
+export function colorRgba(hex: string, alpha: number): string {
+  const r = parseInt(hex.slice(1, 3), 16)
+  const g = parseInt(hex.slice(3, 5), 16)
+  const b = parseInt(hex.slice(5, 7), 16)
+  return `rgba(${r},${g},${b},${alpha})`
+}
+
 export function makeSlot(day: number, hour: number): Slot {
   return `${day}-${hour}`
 }

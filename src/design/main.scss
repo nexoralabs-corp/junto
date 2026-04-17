@@ -3,38 +3,38 @@
 :root {
   color-scheme: light;
 
-  // Backgrounds
-  --bg:       #F7FAFB;
+  // Backgrounds — all teal-tinted
+  --bg:       #F0FAFB;
   --surface:  #FFFFFF;
-  --elevated: #EFF9F8;
-  --overlay:  #E4F4F3;
+  --elevated: #E2F4F4;
+  --overlay:  #C8ECEA;
 
   // Borders
-  --border:   #E2EEED;
-  --border-2: #C8DFDC;
+  --border:   #BDE5E4;
+  --border-2: #93CFCD;
 
-  // Text (slate-based — WCAG AA+ contrast on white)
-  --text:   #0F172A;   // slate-900
-  --text-2: #475569;   // slate-600 · 4.6:1 on white ✓
-  --text-3: #94A3B8;   // slate-400 · hints only, never body
+  // Text — teal-tinted darks (WCAG AA+ on white)
+  --text:   #0D2524;   // ~14:1
+  --text-2: #3B6462;   // ~5.1:1 ✓
+  --text-3: #79ACAB;   // hints only, never body
 
-  // Accent — teal-600
+  // Accent — teal-600 (unchanged)
   --accent:        #0D9488;
   --accent-hover:  #0F766E;
   --accent-dim:    rgba(13, 148, 136, 0.08);
   --accent-glow:   rgba(13, 148, 136, 0.18);
   --accent-border: rgba(13, 148, 136, 0.22);
 
-  // Success — emerald-600
-  --success:      #059669;
-  --success-dim:  rgba(5, 150, 105, 0.10);
-  --success-glow: rgba(5, 150, 105, 0.22);
+  // Success — deep teal (replaces emerald, same hue as accent)
+  --success:      #134E4A;
+  --success-dim:  rgba(19, 78, 74, 0.10);
+  --success-glow: rgba(19, 78, 74, 0.22);
 
-  // Warning — amber-600
-  --warning:     #D97706;
-  --warning-dim: rgba(217, 119, 6, 0.11);
+  // Warning — mid-teal (replaces amber, keeps hue)
+  --warning:     #59B8B5;
+  --warning-dim: rgba(13, 148, 136, 0.10);
 
-  // Error — red-600
+  // Error — red-600 (semantic, kept for accessibility)
   --error:     #DC2626;
   --error-dim: rgba(220, 38, 38, 0.08);
 
@@ -71,9 +71,9 @@ body {
   line-height: 1.6;
   font-size: 15px;
   background-image: radial-gradient(
-    ellipse 70% 35% at 50% -2%,
-    rgba(13, 148, 136, 0.06),
-    transparent
+    ellipse 80% 45% at 50% -4%,
+    rgba(13, 148, 136, 0.13),
+    transparent 65%
   );
   background-attachment: fixed;
 }

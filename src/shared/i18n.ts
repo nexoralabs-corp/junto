@@ -40,6 +40,9 @@ const en = {
     import_error: 'Invalid or empty link.',
     partial_overlap: 'Some overlap',
     all_free: 'Everyone free',
+    share: 'Share',
+    share_all: 'Everyone\'s schedule',
+    share_one: 'Only this person',
   },
   bills: {
     title: 'Bill Splitter',
@@ -117,6 +120,9 @@ const es: typeof en = {
     import_error: 'Link inválido o vacío.',
     partial_overlap: 'Coincidencia parcial',
     all_free: 'Todos libres',
+    share: 'Compartir',
+    share_all: 'Horario de todos',
+    share_one: 'Solo esta persona',
   },
   bills: {
     title: 'Dividir cuenta',

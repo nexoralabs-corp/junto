@@ -4,12 +4,14 @@ import { copyToClipboard } from '../../shared/utils'
 import {
   Participant, SchedulerState, HOURS, NUM_DAYS,
   makeSlot, formatHour, slotCounts, getExistingOverlap, groupSlots,
+  participantColor, colorRgba,
 } from './scheduler'
 import './scheduler.scss'
 
 let participants: Participant[] = []
 let activeTab: 'all' | number = 'all'
 let showLinkForm = false
+let shareOpen = false
 let root: HTMLElement
 
 // Drag state
@@ -17,10 +19,17 @@ let isDragging = false
 let dragAction: 'add' | 'remove' = 'add'
 let dragVisited = new Set<string>()
 
+function autoSave(): void {
+  if (participants.length === 0) return
+  const url = buildShareUrl('scheduler', { participants } satisfies SchedulerState)
+  window.history.replaceState(null, '', url)
+}
+
 export function mount(container: HTMLElement): void {
   root = container
   isDragging = false
   showLinkForm = false
+  shareOpen = false
   const urlState = decodeState<SchedulerState>()
   participants = urlState?.participants ?? []
   activeTab = 'all'
@@ -90,6 +99,7 @@ function applyDragToSlot(slot: string): void {
 function endDrag(): void {
   if (!isDragging) return
   isDragging = false
+  autoSave()
   render()
 }
 
@@ -103,15 +113,22 @@ function buildGrid(): string {
   const days = tArr('scheduler.days')
 
   if (activeTab === 'all') {
-    const counts = slotCounts(participants)
     const total = participants.length
+    // Pre-build slot sets per participant for fast lookup
+    const pSets = participants.map(p => new Set(p.slots))
     const rows = HOURS.map(h => {
       const cells = Array.from({ length: NUM_DAYS }, (_, d) => {
         const slot = makeSlot(d, h)
-        const count = counts.get(slot) ?? 0
-        if (count === 0) return `<div class="sched-cell slot" data-slot="${slot}"></div>`
-        if (total > 0 && count === total) return `<div class="sched-cell slot overlap" data-slot="${slot}"></div>`
-        const ratio = total > 0 ? (count / total).toFixed(2) : '0'
+        const holders = participants.filter((_, i) => pSets[i].has(slot))
+        if (holders.length === 0) return `<div class="sched-cell slot" data-slot="${slot}"></div>`
+        if (total > 0 && holders.length === total) return `<div class="sched-cell slot overlap" data-slot="${slot}"></div>`
+        if (holders.length === 1) {
+          const ci = participants.indexOf(holders[0])
+          const c = participantColor(ci)
+          return `<div class="sched-cell slot solo" data-slot="${slot}"
+            style="--solo-bg:${colorRgba(c, 0.18)};--solo-border:${colorRgba(c, 0.36)}"></div>`
+        }
+        const ratio = total > 0 ? (holders.length / total).toFixed(2) : '0'
         return `<div class="sched-cell slot partial" data-slot="${slot}" style="--overlap-ratio:${ratio}"></div>`
       }).join('')
       return `<div class="sched-cell hour-lbl">${formatHour(h)}</div>${cells}`
@@ -148,7 +165,9 @@ function buildGrid(): string {
     return `<div class="sched-cell hour-lbl">${formatHour(h)}</div>${cells}`
   }).join('')
 
-  return `<div class="sched-grid" id="sched-grid" draggable="false">
+  const color = participantColor(idx)
+  return `<div class="sched-grid" id="sched-grid" draggable="false"
+    style="--mine-color:${color};--mine-dim:${colorRgba(color, 0.15)};--mine-glow:${colorRgba(color, 0.28)}">
     <div class="sched-cell"></div>
     ${days.map(d => `<div class="sched-cell day-lbl">${d}</div>`).join('')}
     ${rows}
@@ -170,6 +189,8 @@ function buildResultsPanel(): string {
     </div></div>`
   }
 
+  // Participant view — color chips with their personal color
+
   const idx = activeTab as number
   const p = participants[idx]
   if (!p || othersFor(idx).length === 0) return ''
@@ -178,7 +199,7 @@ function buildResultsPanel(): string {
   const myOverlap = overlapForParticipant(idx)
   const existingOverlap = getExistingOverlap(others)
   const mySlots = new Set(p.slots)
-
+  const myColor = participantColor(idx)
   return `<div class="results-panel">
     ${myOverlap.size > 0 ? `
       <div class="results-section">
@@ -189,7 +210,9 @@ function buildResultsPanel(): string {
     ${existingOverlap.size > 0 ? `
       <div class="results-section">
         <div class="results-label">${t('scheduler.existing_overlap')}</div>
-        <div class="results-chips">${groupSlots(existingOverlap, days).map(r => `<span class="result-chip others-chip">${r}</span>`).join('')}</div>
+        <div class="results-chips">${groupSlots(existingOverlap, days).map(r =>
+          `<span class="result-chip others-chip" style="background:${colorRgba(myColor,0.07)};border-color:${colorRgba(myColor,0.20)}">${r}</span>`
+        ).join('')}</div>
       </div>` : ''}
   </div>`
 }
@@ -199,12 +222,18 @@ function render(): void {
   const activeP = currentParticipant()
 
   const tabs = `<div class="sched-tabs" role="tablist">
-    <button class="sched-tab${isAll ? ' active' : ''}" data-tab="all" role="tab">${t('scheduler.tab_all')}</button>
-    ${participants.map((p, i) => `
-      <button class="sched-tab${activeTab === i ? ' active' : ''}" data-tab="${i}" role="tab">
+    <button class="sched-tab${isAll ? ' active' : ''}" data-tab="all" role="tab"
+      style="--tab-color:#334155;--tab-color-dim:rgba(51,65,85,0.10)">${t('scheduler.tab_all')}</button>
+    ${participants.map((p, i) => {
+      const c = participantColor(i)
+      const cdim = colorRgba(c, 0.12)
+      return `<button class="sched-tab${activeTab === i ? ' active' : ''}" data-tab="${i}" role="tab"
+        style="--tab-color:${c};--tab-color-dim:${cdim}">
+        <span class="tab-dot" style="background:${c}"></span>
         <span class="tab-name">${p.name || t('scheduler.unnamed')}</span>
         <span class="tab-remove" data-remove="${i}" title="${t('common.remove')}" role="button" aria-label="${t('common.remove')}">×</span>
-      </button>`).join('')}
+      </button>`
+    }).join('')}
     <button class="sched-tab add-tab" id="add-person-btn" title="${t('scheduler.add_person')}">+</button>
     <button class="sched-tab link-tab${showLinkForm ? ' active' : ''}" id="add-link-btn" title="${t('scheduler.add_from_link')}">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
@@ -229,15 +258,27 @@ function render(): void {
 
   const legend = participants.length > 0 ? (isAll
     ? `<div class="overlap-legend">
-        <div class="legend-item"><div class="dot partial-legend"></div> ${t('scheduler.partial_overlap')}</div>
-        <div class="legend-item"><div class="dot overlap"></div> ${t('scheduler.all_free')}</div>
+        ${participants.map((p, i) => {
+          const c = participantColor(i)
+          return `<div class="legend-item">
+            <div class="dot" style="background:${c}"></div>
+            ${p.name || t('scheduler.unnamed')}
+          </div>`
+        }).join('')}
+        ${participants.length >= 2
+          ? `<div class="legend-item"><div class="dot overlap"></div> ${t('scheduler.all_free')}</div>`
+          : ''}
       </div>`
-    : `<div class="overlap-legend">
-        <div class="legend-item"><div class="dot mine"></div> ${t('scheduler.your_name')}</div>
-        <div class="legend-item"><div class="dot others"></div> ${t('scheduler.participants')}</div>
-        <div class="legend-item"><div class="dot all-others"></div> ${t('scheduler.existing_overlap')}</div>
-        <div class="legend-item"><div class="dot overlap"></div> ${t('scheduler.all_free')}</div>
-      </div>`) : ''
+    : (() => {
+        const idx = activeTab as number
+        const c = participantColor(idx)
+        return `<div class="overlap-legend">
+          <div class="legend-item"><div class="dot" style="background:${c}"></div> ${t('scheduler.your_name')}</div>
+          <div class="legend-item"><div class="dot others"></div> ${t('scheduler.participants')}</div>
+          <div class="legend-item"><div class="dot all-others"></div> ${t('scheduler.existing_overlap')}</div>
+          <div class="legend-item"><div class="dot overlap"></div> ${t('scheduler.all_free')}</div>
+        </div>`
+      })()) : ''
 
   root.innerHTML = `
     <div class="page">
@@ -260,13 +301,31 @@ function render(): void {
       ${legend}
       ${buildResultsPanel()}
 
-      <button id="share-btn" class="full-width">${t('scheduler.save_share')}</button>
-      <p id="share-feedback" class="feedback success" hidden></p>
+      <div class="share-wrap">
+        <button id="share-btn" class="full-width secondary">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          ${t('scheduler.share')}
+        </button>
+        ${shareOpen ? `
+          <div class="share-panel">
+            <button class="share-option" id="share-all-btn">
+              <span class="share-option-title">${t('scheduler.share_all')}</span>
+              <span class="share-option-hint">${participants.filter(p=>p.name).map(p=>p.name).join(', ') || '—'}</span>
+            </button>
+            ${typeof activeTab === 'number' && participants[activeTab] ? `
+              <button class="share-option" id="share-one-btn">
+                <span class="share-option-title">${t('scheduler.share_one')}</span>
+                <span class="share-option-hint">${participants[activeTab].name || t('scheduler.unnamed')}</span>
+              </button>` : ''}
+          </div>` : ''}
+        <p id="share-feedback" class="feedback success" hidden></p>
+      </div>
     </div>
   `
 
   // ── Name input ──────────────────────────────────────────────────────────────
-  root.querySelector<HTMLInputElement>('#name-input')?.addEventListener('input', e => {
+  const nameInput = root.querySelector<HTMLInputElement>('#name-input')
+  nameInput?.addEventListener('input', e => {
     const val = (e.target as HTMLInputElement).value
     if (typeof activeTab === 'number' && participants[activeTab]) {
       participants[activeTab].name = val
@@ -274,6 +333,7 @@ function render(): void {
       if (label) label.textContent = val || t('scheduler.unnamed')
     }
   })
+  nameInput?.addEventListener('blur', () => autoSave())
 
   // ── Tabs ────────────────────────────────────────────────────────────────────
   root.querySelectorAll<HTMLElement>('[data-tab]').forEach(btn => {
@@ -292,6 +352,7 @@ function render(): void {
       const idx = parseInt((el as HTMLElement).dataset['remove']!)
       participants.splice(idx, 1)
       if (typeof activeTab === 'number' && activeTab >= participants.length) activeTab = 'all'
+      autoSave()
       render()
     })
   })
@@ -382,18 +443,42 @@ function render(): void {
   }
 
   // ── Share ───────────────────────────────────────────────────────────────────
-  root.querySelector('#share-btn')!.addEventListener('click', async () => {
-    const clean = participants.filter(p => p.name.trim())
-    if (clean.length === 0) return
-    const state: SchedulerState = { participants: clean }
-    const url = buildShareUrl('scheduler', state)
-    window.history.replaceState(null, '', url)
+  async function copied(url: string): Promise<void> {
+    autoSave()
     await copyToClipboard(url)
+    shareOpen = false
+    render()
     const fb = root.querySelector<HTMLElement>('#share-feedback')!
-    fb.hidden = false
-    fb.textContent = t('common.copied')
-    setTimeout(() => { fb.hidden = true }, 2500)
+    if (fb) { fb.hidden = false; fb.textContent = t('common.copied') }
+    setTimeout(() => { if (fb) fb.hidden = true }, 2500)
+  }
+
+  root.querySelector('#share-btn')!.addEventListener('click', () => {
+    if (participants.length === 0) return
+    shareOpen = !shareOpen
+    render()
   })
+
+  root.querySelector('#share-all-btn')?.addEventListener('click', async () => {
+    const url = buildShareUrl('scheduler', { participants } satisfies SchedulerState)
+    await copied(url)
+  })
+
+  root.querySelector('#share-one-btn')?.addEventListener('click', async () => {
+    if (typeof activeTab !== 'number') return
+    const p = participants[activeTab]
+    if (!p) return
+    const url = buildShareUrl('scheduler', { participants: [p] } satisfies SchedulerState)
+    await copied(url)
+  })
+
+  // Close share panel when clicking outside
+  document.addEventListener('click', function onDocClick(e: MouseEvent) {
+    if (!root.querySelector('.share-wrap')?.contains(e.target as Node)) {
+      if (shareOpen) { shareOpen = false; render() }
+      document.removeEventListener('click', onDocClick)
+    }
+  }, { capture: true })
 
   root.querySelector('#lang-btn')!.addEventListener('click', () => {
     toggleLang()

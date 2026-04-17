@@ -24,13 +24,16 @@
   transition: background 120ms, color 120ms;
   white-space: nowrap;
 
-  &:hover { background: var(--overlay); }
+  &:hover:not(.add-tab):not(.link-tab) {
+    background: var(--tab-color-dim, var(--overlay));
+  }
 
   &.active {
-    background: var(--accent);
+    background: var(--tab-color, var(--accent));
     color: #fff;
 
-    .tab-remove { color: rgba(255,255,255,0.7); &:hover { color: #fff; } }
+    .tab-remove { color: rgba(255,255,255,0.65); &:hover { color: #fff; } }
+    .tab-dot { display: none; }
   }
 
   &.add-tab {
@@ -47,6 +50,13 @@
     &:hover { color: var(--accent); background: var(--accent-dim); }
     &.active { background: var(--accent-dim); color: var(--accent); }
   }
+}
+
+.tab-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .tab-remove {
@@ -159,25 +169,31 @@
     }
 
     &.mine {
-      background: var(--accent);
-      border-color: var(--accent);
-      box-shadow: 0 0 0 1px rgba(13, 148, 136, 0.3), 0 2px 6px rgba(13, 148, 136, 0.25);
+      background: var(--mine-color, var(--accent));
+      border-color: var(--mine-color, var(--accent));
+      box-shadow: 0 0 0 1px var(--mine-dim, rgba(13,148,136,0.3)), 0 2px 6px var(--mine-dim, rgba(13,148,136,0.25));
+    }
+
+    &.solo {
+      background: var(--solo-bg, var(--accent-dim));
+      border-color: var(--solo-border, var(--accent-border));
+      cursor: default;
     }
 
     &.partial {
-      background: rgba(5, 150, 105, calc(var(--overlap-ratio, 0) * 0.45));
-      border-color: rgba(5, 150, 105, calc(var(--overlap-ratio, 0) * 0.4));
+      background: rgba(13, 148, 136, calc(var(--overlap-ratio, 0) * 0.45));
+      border-color: rgba(13, 148, 136, calc(var(--overlap-ratio, 0) * 0.40));
       cursor: default;
     }
 
     &.all-others {
-      background: rgba(5, 150, 105, 0.12);
-      border-color: rgba(5, 150, 105, 0.3);
+      background: rgba(13, 148, 136, 0.20);
+      border-color: rgba(13, 148, 136, 0.35);
     }
 
     &.others {
       background: var(--warning-dim);
-      border-color: rgba(217, 119, 6, 0.25);
+      border-color: rgba(13, 148, 136, 0.20);
     }
 
     &.mine.others {
@@ -221,11 +237,11 @@
     border-radius: 3px;
     flex-shrink: 0;
 
-    &.mine          { background: var(--accent); }
-    &.all-others    { background: rgba(5, 150, 105, 0.25); }
-    &.others        { background: var(--warning); opacity: 0.65; }
-    &.overlap       { background: var(--success); }
-    &.partial-legend { background: rgba(5, 150, 105, 0.3); }
+    &.mine           { background: var(--accent); }
+    &.all-others     { background: rgba(13, 148, 136, 0.35); }
+    &.others         { background: var(--warning); opacity: 0.55; }
+    &.overlap        { background: var(--success); }
+    &.partial-legend { background: rgba(13, 148, 136, 0.35); }
   }
 }
 
@@ -269,15 +285,68 @@
   font-weight: 500;
 
   &.overlap-chip {
-    background: rgba(5, 150, 105, 0.1);
+    background: rgba(19, 78, 74, 0.08);
     color: var(--success);
-    border: 1px solid rgba(5, 150, 105, 0.25);
+    border: 1px solid rgba(19, 78, 74, 0.22);
   }
 
   &.others-chip {
-    background: rgba(5, 150, 105, 0.06);
+    background: rgba(13, 148, 136, 0.07);
     color: var(--text-2);
-    border: 1px solid rgba(5, 150, 105, 0.18);
+    border: 1px solid rgba(13, 148, 136, 0.18);
+  }
+}
+
+.share-wrap {
+  position: relative;
+}
+
+.share-panel {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.10), 0 2px 8px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  z-index: 10;
+}
+
+.share-option {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  width: 100%;
+  padding: 11px 16px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  cursor: pointer;
+  text-align: left;
+  transition: background 120ms;
+  color: var(--text);
+
+  &:last-child { border-bottom: none; }
+  &:hover { background: var(--elevated); box-shadow: none; }
+  &:active { transform: none; box-shadow: none; }
+
+  .share-option-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .share-option-hint {
+    font-size: 0.72rem;
+    color: var(--text-3);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
   }
 }
 
