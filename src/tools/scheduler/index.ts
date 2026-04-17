@@ -242,9 +242,12 @@ function render(): void {
 
   const linkForm = showLinkForm ? `
     <div class="link-import-form">
-      <input id="link-input" type="url" placeholder="${t('scheduler.paste_link')}" autocomplete="off" />
-      <button class="secondary sm" id="link-import-btn">${t('scheduler.import')}</button>
-      <span class="link-cancel" id="link-cancel-btn">×</span>
+      <span class="link-import-label">${t('scheduler.add_from_link')}</span>
+      <div class="link-import-row">
+        <input id="link-input" type="url" placeholder="${t('scheduler.paste_link')}" autocomplete="off" />
+        <button class="secondary sm" id="link-import-btn">${t('scheduler.import')}</button>
+        <span class="link-cancel" id="link-cancel-btn" role="button" aria-label="${t('common.remove')}">×</span>
+      </div>
       <p id="link-error" class="feedback error" hidden></p>
     </div>` : ''
 
