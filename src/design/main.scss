@@ -113,8 +113,8 @@ p { color: var(--text-2); }
 // ─── Layout ───────────────────────────────────────────────────────────────────
 
 .page {
-  max-width: 520px;
-  margin: 0 auto;
+  width: 90%;
+  margin-inline: auto;
   padding: 1.5rem 1.25rem 4rem;
 }
 
@@ -468,6 +468,8 @@ label {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  max-width: 640px;
+  margin-inline: auto;
 }
 
 .tool-card {
@@ -745,5 +747,421 @@ label {
     flex-shrink: 0;
     font-size: 0.65rem;
     margin-top: 3px;
+  }
+}
+
+// ─── Responsive ──────────────────────────────────────────────────────────────
+
+@media (min-width: 1024px) {
+  html {
+    font-size: 16px;
+  }
+
+  body {
+    font-size: 15px;
+  }
+
+  .page {
+    padding: 2rem 2.5rem 4rem;
+  }
+
+  .home-header {
+    margin-bottom: 3.5rem;
+  }
+
+  .home-hero {
+    margin-bottom: 3rem;
+
+    h1 {
+      font-size: 2.25rem;
+    }
+
+    p {
+      font-size: 1rem;
+    }
+  }
+
+  .tool-cards {
+    gap: 14px;
+  }
+
+  .tool-card {
+    padding: 1.375rem 1.5rem;
+    border-radius: var(--r-xl);
+
+    .tool-icon {
+      width: 52px;
+      height: 52px;
+      font-size: 1.5rem;
+    }
+
+    .tool-name {
+      font-size: 1rem;
+    }
+
+    .tool-desc {
+      font-size: 0.875rem;
+    }
+  }
+
+  button {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+
+    &.sm {
+      padding: 6px 13px;
+      font-size: 0.875rem;
+    }
+  }
+
+  .modal-backdrop {
+    padding: 1.75rem;
+  }
+
+  .modal {
+    padding: 2rem;
+    max-width: 540px;
+    max-height: 92dvh;
+    border-radius: var(--r-xl);
+  }
+
+  .modal-header {
+    padding-right: 2.5rem;
+
+    .modal-icon {
+      width: 48px;
+      height: 48px;
+      font-size: 1.5rem;
+    }
+
+    h2 {
+      font-size: 1.25rem;
+    }
+  }
+
+  .modal-desc {
+    font-size: 0.95rem;
+  }
+
+  .modal-steps {
+    gap: 12px;
+
+    li {
+      font-size: 0.9rem;
+
+      &::before {
+        min-width: 24px;
+        height: 24px;
+        font-size: 0.75rem;
+      }
+    }
+  }
+
+  .modal-note {
+    padding: 13px 16px;
+    font-size: 0.875rem;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  html {
+    font-size: 15.5px;
+  }
+
+  body {
+    font-size: 14.5px;
+  }
+
+  .page {
+    padding: 1.75rem 2rem 3.5rem;
+  }
+
+  .home-header {
+    margin-bottom: 3rem;
+  }
+
+  .home-hero {
+    margin-bottom: 2.5rem;
+
+    h1 {
+      font-size: 2rem;
+    }
+
+    p {
+      font-size: 0.95rem;
+    }
+  }
+
+  .tool-cards {
+    gap: 12px;
+  }
+
+  .tool-card {
+    padding: 1.25rem 1.375rem;
+    border-radius: var(--r-xl);
+
+    .tool-icon {
+      width: 48px;
+      height: 48px;
+      font-size: 1.375rem;
+    }
+
+    .tool-name {
+      font-size: 0.95rem;
+    }
+
+    .tool-desc {
+      font-size: 0.825rem;
+    }
+  }
+
+  button {
+    padding: 8px 16px;
+    font-size: 0.875rem;
+
+    &.sm {
+      padding: 5px 11px;
+      font-size: 0.825rem;
+    }
+  }
+
+  .modal-backdrop {
+    padding: 1.5rem;
+  }
+
+  .modal {
+    padding: 1.75rem;
+    max-width: 520px;
+    max-height: 90dvh;
+    border-radius: var(--r-xl);
+  }
+
+  .modal-header {
+    padding-right: 2.25rem;
+
+    .modal-icon {
+      width: 46px;
+      height: 46px;
+      font-size: 1.375rem;
+    }
+
+    h2 {
+      font-size: 1.1875rem;
+    }
+  }
+
+  .modal-desc {
+    font-size: 0.925rem;
+  }
+
+  .modal-steps {
+    gap: 11px;
+
+    li {
+      font-size: 0.875rem;
+
+      &::before {
+        min-width: 23px;
+        height: 23px;
+        font-size: 0.725rem;
+      }
+    }
+  }
+
+  .modal-note {
+    padding: 12px 15px;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  html {
+    font-size: 14px;
+  }
+
+  body {
+    font-size: 14px;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  h2 {
+    font-size: 1.1rem;
+  }
+
+  .page {
+    padding: 1rem 1rem 3rem;
+  }
+
+  .home-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 2rem;
+
+    .logo {
+      width: 100%;
+      justify-content: center;
+    }
+
+    button {
+      width: 100%;
+    }
+  }
+
+  .home-hero {
+    margin-bottom: 1.5rem;
+
+    h1 {
+      font-size: 1.375rem;
+    }
+
+    p {
+      font-size: 0.875rem;
+    }
+  }
+
+  .tool-cards {
+    gap: 8px;
+  }
+
+  .tool-card {
+    padding: 1rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+
+    &:hover {
+      transform: none;
+    }
+
+    .tool-icon {
+      width: 38px;
+      height: 38px;
+      font-size: 1.125rem;
+    }
+
+    .tool-name {
+      font-size: 0.9rem;
+    }
+
+    .tool-desc {
+      font-size: 0.75rem;
+    }
+
+    .tool-arrow {
+      display: none;
+    }
+  }
+
+  .info-btn {
+    position: absolute;
+    top: 0.625rem;
+    right: 0.625rem;
+  }
+
+  button {
+    padding: 7px 14px;
+    font-size: 0.85rem;
+
+    &.sm {
+      padding: 4px 9px;
+      font-size: 0.75rem;
+    }
+  }
+
+  .modal-backdrop {
+    padding: 0.75rem;
+  }
+
+  .modal {
+    padding: 1.25rem;
+    border-radius: var(--r-lg);
+    max-height: 90dvh;
+  }
+
+  .modal-header {
+    padding-right: 1.75rem;
+
+    .modal-icon {
+      width: 36px;
+      height: 36px;
+      font-size: 1.125rem;
+    }
+
+    h2 {
+      font-size: 1rem;
+    }
+  }
+
+  .modal-desc {
+    font-size: 0.875rem;
+  }
+
+  .modal-steps {
+    gap: 8px;
+
+    li {
+      font-size: 0.825rem;
+
+      &::before {
+        min-width: 18px;
+        height: 18px;
+        font-size: 0.65rem;
+      }
+    }
+  }
+
+  .modal-note {
+    padding: 9px 12px;
+    font-size: 0.7875rem;
+  }
+}
+
+@media (max-width: 360px) {
+  html {
+    font-size: 13px;
+  }
+
+  body {
+    font-size: 13px;
+  }
+
+  h1 {
+    font-size: 1.25rem;
+  }
+
+  .home-hero h1 {
+    font-size: 1.25rem;
+  }
+
+  .tool-card {
+    padding: 0.875rem;
+
+    .tool-icon {
+      width: 34px;
+      height: 34px;
+      font-size: 1rem;
+    }
+
+    .tool-name {
+      font-size: 0.85rem;
+    }
+
+    .tool-desc {
+      font-size: 0.7rem;
+    }
+  }
+
+  button {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+
+    &.sm {
+      padding: 3px 8px;
+      font-size: 0.7rem;
+    }
   }
 }

@@ -8,7 +8,7 @@ const en = {
     tagline: 'Tools for small groups. No accounts. No servers. Just links.',
     scheduler: 'Sync Times',
     bills: 'Bill Splitter',
-    lang: 'ES',
+    lang: 'EN',
   },
   common: {
     back: '← Back',
@@ -90,7 +90,7 @@ const es: typeof en = {
     tagline: 'Herramientas para grupos. Sin cuentas. Sin servidores. Solo links.',
     scheduler: 'Sincronizar horarios',
     bills: 'Dividir cuenta',
-    lang: 'EN',
+    lang: 'ES',
   },
   common: {
     back: '← Volver',
