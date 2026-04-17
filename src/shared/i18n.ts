@@ -49,6 +49,21 @@ const en = {
     need_people: 'Add at least 2 people to start.',
     total: 'Total',
   },
+  modal: {
+    close: 'Close',
+    how_it_works: 'How it works',
+    good_to_know: 'Good to know',
+    scheduler_desc: 'Coordinate your group\'s availability without endless back-and-forth. Everyone adds their free slots to the same link — no accounts, no calendar access needed.',
+    scheduler_step1: 'Pick the time slots when you\'re free on the weekly grid.',
+    scheduler_step2: 'Hit "Save & Share" — your availability is encoded in the link.',
+    scheduler_step3: 'Friends open the link, add their own slots, and share again. Green slots = everyone is free.',
+    scheduler_note: 'The link is the data. No server involved — the URL itself holds everyone\'s schedule.',
+    bills_desc: 'Track shared expenses and get a clean settlement — with the fewest transactions possible. Great for trips, dinners, or any group spending.',
+    bills_step1: 'Add everyone in the group by name.',
+    bills_step2: 'Log each expense: what it was for, who paid, and who was involved.',
+    bills_step3: 'The app calculates exactly who pays whom. Share the link so everyone sees the breakdown.',
+    bills_note: 'Uses a debt minimization algorithm — fewer transactions, same fair result. All math done in cents to avoid rounding errors.',
+  },
 }
 
 const es: typeof en = {
@@ -97,6 +112,21 @@ const es: typeof en = {
     no_expenses: 'Sin gastos aún.',
     need_people: 'Agrega al menos 2 personas para comenzar.',
     total: 'Total',
+  },
+  modal: {
+    close: 'Cerrar',
+    how_it_works: 'Cómo funciona',
+    good_to_know: 'Dato importante',
+    scheduler_desc: 'Coordina la disponibilidad de tu grupo sin mensajes interminables. Cada persona agrega sus horarios libres al mismo link — sin cuentas ni acceso al calendario.',
+    scheduler_step1: 'Selecciona las horas en que estás libre en la grilla semanal.',
+    scheduler_step2: 'Toca "Guardar y compartir" — tu disponibilidad queda codificada en el link.',
+    scheduler_step3: 'Tus amigos abren el link, agregan sus horarios y comparten de nuevo. Los casilleros verdes = todos están libres.',
+    scheduler_note: 'El link es el dato. Sin servidor — la URL en sí guarda el horario de todos.',
+    bills_desc: 'Registra gastos compartidos y obtén una liquidación clara — con la menor cantidad de transacciones posible. Ideal para viajes, cenas o cualquier gasto grupal.',
+    bills_step1: 'Agrega a todos los integrantes del grupo por nombre.',
+    bills_step2: 'Registra cada gasto: para qué fue, quién pagó y quiénes participaron.',
+    bills_step3: 'La app calcula exactamente quién le paga a quién. Comparte el link para que todos vean el resumen.',
+    bills_note: 'Usa un algoritmo de minimización de deuda — menos transacciones, mismo resultado justo. Todo en centavos para evitar errores de redondeo.',
   },
 }
 

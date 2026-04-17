@@ -1,3 +1,4 @@
+import '@fontsource-variable/plus-jakarta-sans'
 import './design/main.scss'
 import { t, toggleLang } from './shared/i18n'
 
@@ -41,6 +42,7 @@ function renderHome(): void {
             <div class="tool-name">${t('nav.scheduler')}</div>
             <div class="tool-desc">Find when everyone is free</div>
           </div>
+          <button class="info-btn" data-modal="scheduler" title="Learn more">i</button>
           <div class="tool-arrow">→</div>
         </a>
         <a href="#bills" class="tool-card">
@@ -49,6 +51,7 @@ function renderHome(): void {
             <div class="tool-name">${t('nav.bills')}</div>
             <div class="tool-desc">Split expenses, settle up</div>
           </div>
+          <button class="info-btn" data-modal="bills" title="Learn more">i</button>
           <div class="tool-arrow">→</div>
         </a>
       </div>
@@ -59,6 +62,62 @@ function renderHome(): void {
     toggleLang()
     renderHome()
   })
+
+  app.querySelectorAll<HTMLButtonElement>('.info-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.preventDefault()
+      e.stopPropagation()
+      openModal(btn.dataset['modal'] as 'scheduler' | 'bills')
+    })
+  })
+}
+
+function openModal(tool: 'scheduler' | 'bills'): void {
+  const isScheduler = tool === 'scheduler'
+  const icon = isScheduler ? '📅' : '💸'
+  const title = t(isScheduler ? 'nav.scheduler' : 'nav.bills')
+  const desc = t(isScheduler ? 'modal.scheduler_desc' : 'modal.bills_desc')
+  const step1 = t(isScheduler ? 'modal.scheduler_step1' : 'modal.bills_step1')
+  const step2 = t(isScheduler ? 'modal.scheduler_step2' : 'modal.bills_step2')
+  const step3 = t(isScheduler ? 'modal.scheduler_step3' : 'modal.bills_step3')
+  const note = t(isScheduler ? 'modal.scheduler_note' : 'modal.bills_note')
+
+  const backdrop = document.createElement('div')
+  backdrop.className = 'modal-backdrop'
+  backdrop.innerHTML = `
+    <div class="modal" role="dialog" aria-modal="true" aria-label="${title}">
+      <button class="modal-close" id="modal-close" aria-label="${t('modal.close')}">×</button>
+      <div class="modal-header">
+        <div class="modal-icon">${icon}</div>
+        <h2>${title}</h2>
+      </div>
+      <p class="modal-desc">${desc}</p>
+      <div class="modal-section-title">${t('modal.how_it_works')}</div>
+      <ol class="modal-steps">
+        <li>${step1}</li>
+        <li>${step2}</li>
+        <li>${step3}</li>
+      </ol>
+      <div class="modal-section-title">${t('modal.good_to_know')}</div>
+      <div class="modal-note">${note}</div>
+    </div>
+  `
+
+  document.body.appendChild(backdrop)
+  requestAnimationFrame(() => backdrop.classList.add('open'))
+
+  const close = (): void => {
+    backdrop.classList.remove('open')
+    backdrop.addEventListener('transitionend', () => backdrop.remove(), { once: true })
+  }
+
+  backdrop.addEventListener('click', e => { if (e.target === backdrop) close() })
+  backdrop.querySelector('#modal-close')!.addEventListener('click', close)
+
+  const onKey = (e: KeyboardEvent): void => {
+    if (e.key === 'Escape') { close(); document.removeEventListener('keydown', onKey) }
+  }
+  document.addEventListener('keydown', onKey)
 }
 
 window.addEventListener('hashchange', render)

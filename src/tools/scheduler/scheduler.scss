@@ -4,13 +4,13 @@
   gap: 6px;
   padding: 5px 13px;
   background: var(--accent-dim);
-  border: 1px solid rgba(124, 106, 247, 0.18);
+  border: 1.5px solid var(--accent-border);
   border-radius: var(--r-full);
   font-size: 0.8rem;
   color: var(--text-2);
   margin-bottom: 1.25rem;
 
-  strong { color: var(--accent); font-weight: 500; }
+  strong { color: var(--accent-hover); font-weight: 600; }
 }
 
 .grid-scroll {
@@ -19,8 +19,9 @@
   margin: 1.25rem 0;
   padding: 0.875rem;
   background: var(--surface);
-  border: 1px solid var(--border-2);
+  border: 1.5px solid var(--border);
   border-radius: var(--r-lg);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 
 .sched-grid {
@@ -39,6 +40,7 @@
 
   &.hour-lbl {
     font-size: 0.575rem;
+    font-weight: 500;
     color: var(--text-3);
     justify-content: flex-end;
     padding-right: 5px;
@@ -48,7 +50,7 @@
 
   &.day-lbl {
     font-size: 0.625rem;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--text-2);
     cursor: default;
     letter-spacing: 0.06em;
@@ -56,8 +58,8 @@
   }
 
   &.slot {
-    background: var(--elevated);
-    border: 1px solid var(--border);
+    background: var(--bg);
+    border: 1.5px solid var(--border);
     cursor: pointer;
     transition: background 100ms ease, border-color 100ms ease, box-shadow 100ms ease;
     user-select: none;
@@ -70,12 +72,12 @@
     &.mine {
       background: var(--accent);
       border-color: var(--accent);
-      box-shadow: 0 0 5px rgba(124, 106, 247, 0.45);
+      box-shadow: 0 0 0 1px rgba(13, 148, 136, 0.3), 0 2px 6px rgba(13, 148, 136, 0.25);
     }
 
     &.others {
       background: var(--warning-dim);
-      border-color: rgba(245, 163, 11, 0.22);
+      border-color: rgba(217, 119, 6, 0.25);
     }
 
     &.mine.others {
@@ -86,13 +88,13 @@
     &.overlap {
       background: var(--success);
       border-color: var(--success);
-      box-shadow: 0 0 6px var(--success-glow);
+      box-shadow: 0 0 0 1px var(--success-glow), 0 2px 6px var(--success-dim);
     }
 
     &.mine.overlap {
       background: var(--success);
       border-color: var(--success);
-      box-shadow: 0 0 8px var(--success-glow);
+      box-shadow: 0 0 0 1px var(--success-glow), 0 2px 8px var(--success-dim);
     }
   }
 }
@@ -103,6 +105,7 @@
   flex-wrap: wrap;
   gap: 0.875rem;
   font-size: 0.75rem;
+  font-weight: 500;
   color: var(--text-2);
   margin-bottom: 1.5rem;
 
@@ -118,8 +121,8 @@
     border-radius: 3px;
     flex-shrink: 0;
 
-    &.mine { background: var(--accent); }
-    &.others { background: var(--warning); opacity: 0.65; }
+    &.mine    { background: var(--accent); }
+    &.others  { background: var(--warning); opacity: 0.65; }
     &.overlap { background: var(--success); }
   }
 }
