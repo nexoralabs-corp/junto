@@ -3,36 +3,36 @@
 :root {
   color-scheme: light;
 
-  // Backgrounds — all teal-tinted
-  --bg:       #F0FAFB;
+  // Backgrounds — clean slate/indigo palette
+  --bg:       #F8FAFC;
   --surface:  #FFFFFF;
-  --elevated: #E2F4F4;
-  --overlay:  #C8ECEA;
+  --elevated: #E8F0FE;
+  --overlay:  #C7D2FE;
 
   // Borders
-  --border:   #BDE5E4;
-  --border-2: #93CFCD;
+  --border:   #E2E8F0;
+  --border-2: #CBD5E1;
 
-  // Text — teal-tinted darks (WCAG AA+ on white)
-  --text:   #0D2524;   // ~14:1
-  --text-2: #3B6462;   // ~5.1:1 ✓
-  --text-3: #79ACAB;   // hints only, never body
+  // Text — slate darks (WCAG AA+ on white)
+  --text:   #1E293B;   // ~14:1
+  --text-2: #475569;   // ~5.5:1 ✓
+  --text-3: #94A3B8;   // hints only, never body
 
-  // Accent — teal-600 (unchanged)
-  --accent:        #0D9488;
-  --accent-hover:  #0F766E;
-  --accent-dim:    rgba(13, 148, 136, 0.08);
-  --accent-glow:   rgba(13, 148, 136, 0.18);
-  --accent-border: rgba(13, 148, 136, 0.22);
+  // Accent — indigo-600 (modern, professional)
+  --accent:        #4F46E5;
+  --accent-hover:  #4338CA;
+  --accent-dim:    rgba(79, 70, 229, 0.08);
+  --accent-glow:   rgba(79, 70, 229, 0.18);
+  --accent-border: rgba(79, 70, 229, 0.22);
 
-  // Success — deep teal (replaces emerald, same hue as accent)
-  --success:      #134E4A;
-  --success-dim:  rgba(19, 78, 74, 0.10);
-  --success-glow: rgba(19, 78, 74, 0.22);
+  // Success — emerald-600 (contrasting but harmonious)
+  --success:      #059669;
+  --success-dim:  rgba(5, 150, 105, 0.10);
+  --success-glow: rgba(5, 150, 105, 0.22);
 
-  // Warning — mid-teal (replaces amber, keeps hue)
-  --warning:     #59B8B5;
-  --warning-dim: rgba(13, 148, 136, 0.10);
+  // Warning — amber-500 (warm, attention-grabbing)
+  --warning:     #F59E0B;
+  --warning-dim: rgba(245, 158, 11, 0.10);
 
   // Error — red-600 (semantic, kept for accessibility)
   --error:     #DC2626;
@@ -106,6 +106,7 @@ body {
 
     svg {
       color: var(--accent);
+      filter: drop-shadow(0 0 6px var(--accent-glow));
     }
   }
 }
