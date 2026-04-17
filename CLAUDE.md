@@ -25,11 +25,12 @@ Name from old word for small group with shared purpose. That vibe.
 | Layer | Choice | Why |
 |---|---|---|
 | Bundler | **Vite** | Zero-config, fast dev server, clean builds |
+| Package manager | **Bun** | Faster installs + runs, replaces npm/node |
 | Language | **TypeScript** | Safety as codebase grows across multiple tools |
-| UI | **Vanilla TS** (no framework) | Tools mostly form → output, no deep component trees needed |
-| Styling | Single design system file | Consistent look across all tools |
+| UI | **Vanilla TS** + **PicoCSS** | No JS framework, PicoCSS handles base styling (~10kb classless CSS) |
+| Styling | `tokens.css` overrides PicoCSS vars | Consistent look across all tools |
 | Testing | **Vitest** | Easy unit tests for math-heavy logic (splits, overlaps) |
-| Deployment | GitHub Pages / Netlify / Cloudflare Pages | Free, static, no server needed |
+| Deployment | **GitHub Pages** | Free, static, no server needed |
 
 No React. No Vue. No Svelte. No UI library. Bundle stays tiny.
 
@@ -69,7 +70,7 @@ junto/
 ## Shared Primitives (build once, reuse everywhere)
 
 ### `url-state.ts`
-Backbone of Junto's sharing model. Every tool serializes state into compressed, base64-encoded URL hash. Sharing = copying URL.
+Backbone of sharing. Every tool serializes state into compressed, base64-encoded URL hash. Sharing = copy URL.
 
 ```ts
 // Encode any object into the URL hash
@@ -147,7 +148,7 @@ Every new tool: URL-encoded state, no DB, no login, works offline.
 
 ## Navigation / Routing
 
-Simple hash-based routing. No router library needed.
+Hash-based routing. No router library needed.
 
 ```
 junto.app/           → landing / tool picker
@@ -171,11 +172,8 @@ junto.app/#scheduler&data=... → Scheduler with pre-loaded state
 ## Deployment
 
 ```bash
-npm run build       # outputs to /dist
-# deploy /dist to any static host:
-# - GitHub Pages (free, automatic via Actions)
-# - Netlify (free tier, drag and drop /dist)
-# - Cloudflare Pages (free, fastest CDN)
+bun run build       # outputs to /dist
+# deploy /dist to GitHub Pages (via Actions)
 ```
 
 ---
@@ -183,15 +181,12 @@ npm run build       # outputs to /dist
 ## Development Setup
 
 ```bash
-npm create vite@latest junto -- --template vanilla-ts
+bunx create-vite junto --template vanilla-ts
 cd junto
-npm install
-npm run dev         # localhost:5173
-```
-
-Add Vitest:
-```bash
-npm install -D vitest
+bun install
+bun add @picocss/pico
+bun add -d vitest
+bun run dev         # localhost:5173
 ```
 
 ---

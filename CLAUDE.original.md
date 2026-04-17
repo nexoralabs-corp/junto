@@ -2,20 +2,20 @@
 
 ## What is Junto?
 
-Junto is a **local-first, static utility toolkit** for friends. A collection of small, focused tools that solve real-life coordination problems — no accounts, no databases, no servers. Just open it and it works.
+Junto = **local-first, static utility toolkit** for friends. Small, focused tools solving real-life coordination problems — no accounts, no databases, no servers. Open and works.
 
-The name comes from an old word for a small group with a shared purpose. That's exactly the vibe.
+Name from old word for small group with shared purpose. That vibe.
 
 ---
 
 ## Core Philosophy
 
-- **No DB** — ever. State lives in the URL or localStorage only.
+- **No DB** — ever. State lives in URL or localStorage only.
 - **No login** — ever. No accounts, no auth, no user data stored anywhere.
-- **No backend** — pure static files, deployable to GitHub Pages, Netlify, Vercel, Cloudflare Pages for free.
+- **No backend** — pure static files, deployable to GitHub Pages, Netlify, Vercel, Cloudflare Pages free.
 - **No external connections** — no APIs, no analytics, no tracking.
-- **Shareable via URL** — the primary sharing mechanism is encoded state in the URL hash. Anyone with the link gets the full context.
-- **Offline-capable** — tools work without internet after the first load.
+- **Shareable via URL** — primary sharing = encoded state in URL hash. Anyone with link gets full context.
+- **Offline-capable** — works without internet after first load.
 - **One person can use it alone** — tools don't require multiple people to be useful.
 
 ---
@@ -25,13 +25,14 @@ The name comes from an old word for a small group with a shared purpose. That's 
 | Layer | Choice | Why |
 |---|---|---|
 | Bundler | **Vite** | Zero-config, fast dev server, clean builds |
+| Package manager | **Bun** | Faster installs + runs, replaces npm/node |
 | Language | **TypeScript** | Safety as codebase grows across multiple tools |
-| UI | **Vanilla TS** (no framework) | Tools are mostly form → output, no deep component trees needed |
-| Styling | Single design system file | Consistent look across all tools |
+| UI | **Vanilla TS** + **PicoCSS** | No JS framework, PicoCSS handles base styling (~10kb classless CSS) |
+| Styling | `tokens.css` overrides PicoCSS vars | Consistent look across all tools |
 | Testing | **Vitest** | Easy unit tests for math-heavy logic (splits, overlaps) |
-| Deployment | GitHub Pages / Netlify / Cloudflare Pages | Free, static, no server needed |
+| Deployment | **GitHub Pages** | Free, static, no server needed |
 
-No React. No Vue. No Svelte. No UI library. Keep the bundle tiny.
+No React. No Vue. No Svelte. No UI library. Bundle stays tiny.
 
 ---
 
@@ -69,7 +70,7 @@ junto/
 ## Shared Primitives (build once, reuse everywhere)
 
 ### `url-state.ts`
-The backbone of Junto's sharing model. Every tool serializes its state into a compressed, base64-encoded URL hash. Sharing = copying the URL.
+Backbone of Junto's sharing model. Every tool serializes state into compressed, base64-encoded URL hash. Sharing = copying URL.
 
 ```ts
 // Encode any object into the URL hash
@@ -82,7 +83,7 @@ export function decodeState<T>(): T | null
 ```
 
 ### `storage.ts`
-Thin wrapper around localStorage for optional local persistence (e.g., remembering your name between sessions).
+Thin wrapper around localStorage for optional local persistence (e.g., remembering name between sessions).
 
 ```ts
 export function save<T>(key: string, value: T): void
@@ -91,7 +92,7 @@ export function clear(key: string): void
 ```
 
 ### `utils.ts`
-Shared helpers — no need to reinvent per tool:
+Shared helpers — no reinventing per tool:
 - Date/time formatting
 - Currency formatting and rounding (important for bill splitting)
 - Array intersection (important for scheduler)
@@ -103,15 +104,15 @@ Shared helpers — no need to reinvent per tool:
 
 ### ✅ Tool 1 — Sync Times (Scheduler)
 
-**Problem:** Coordinating availability across a group is painful.
+**Problem:** Coordinating availability across group is painful.
 
 **How it works:**
-1. You open the tool, pick your available time slots for the week (or custom range)
-2. Click "Share" → get a unique URL encoding your availability
-3. Friends open your link, add their own availability on top
-4. The tool shows all time slots where everyone overlaps
+1. Open tool, pick available time slots for week (or custom range)
+2. Click "Share" → get unique URL encoding availability
+3. Friends open link, add own availability on top
+4. Tool shows all time slots where everyone overlaps
 
-**Key logic:** URL accumulates each person's data. The final URL holds everyone's schedule. No server needed — the URL IS the data.
+**Key logic:** URL accumulates each person's data. Final URL holds everyone's schedule. No server — URL IS data.
 
 **UI:** Weekly grid. Click slots to toggle. Green = available. Overlap slots highlighted.
 
@@ -119,12 +120,12 @@ Shared helpers — no need to reinvent per tool:
 
 ### ✅ Tool 2 — Bill Splitter
 
-**Problem:** After a dinner or trip, splitting bills fairly is annoying, especially with unequal shares.
+**Problem:** After dinner or trip, splitting bills fairly is annoying, especially with unequal shares.
 
 **How it works:**
 1. One person enters all items/expenses and who was involved in each
-2. The tool calculates the minimum number of transactions to settle all debts (not just split evenly)
-3. Click "Share" → everyone gets a link showing exactly who pays who and how much
+2. Tool calculates minimum transactions to settle all debts (not just split evenly)
+3. Click "Share" → everyone gets link showing exactly who pays who and how much
 
 **Key logic:** Debt minimization algorithm (net balance per person → greedy settlement). Currency handled carefully to avoid rounding errors.
 
@@ -134,14 +135,14 @@ Shared helpers — no need to reinvent per tool:
 
 ### 🔮 Future Tool Ideas (same principles apply)
 
-- **Availability Poll** — "When works for everyone?" without a Doodle account
+- **Availability Poll** — "When works for everyone?" without Doodle account
 - **Trip Packing List** — shared checklist via URL, no login
 - **Secret Santa Draw** — enter names, get assignments via unique URLs per person
 - **Movie Picker** — everyone submits options, app picks randomly or by ranked vote
-- **Countdown** — shareable countdown timer to an event
-- **Split the Tab** — simplified version of bill splitter for equal splits only
+- **Countdown** — shareable countdown timer to event
+- **Split the Tab** — simplified bill splitter for equal splits only
 
-Every new tool follows the same rules: URL-encoded state, no DB, no login, works offline.
+Every new tool: URL-encoded state, no DB, no login, works offline.
 
 ---
 
@@ -160,8 +161,8 @@ junto.app/#scheduler&data=... → Scheduler with pre-loaded state
 
 ## Design Principles
 
-- **Minimal UI** — tools should feel like focused instruments, not dashboards
-- **Mobile-first** — people coordinate on their phones
+- **Minimal UI** — tools feel like focused instruments, not dashboards
+- **Mobile-first** — people coordinate on phones
 - **No dark patterns** — no "sign up to see results", no popups, no upsells
 - **Fast** — first paint under 1 second, no heavy dependencies
 - **Accessible** — keyboard navigable, sufficient color contrast
@@ -171,11 +172,8 @@ junto.app/#scheduler&data=... → Scheduler with pre-loaded state
 ## Deployment
 
 ```bash
-npm run build       # outputs to /dist
-# deploy /dist to any static host:
-# - GitHub Pages (free, automatic via Actions)
-# - Netlify (free tier, drag and drop /dist)
-# - Cloudflare Pages (free, fastest CDN)
+bun run build       # outputs to /dist
+# deploy /dist to GitHub Pages (via Actions)
 ```
 
 ---
@@ -183,15 +181,12 @@ npm run build       # outputs to /dist
 ## Development Setup
 
 ```bash
-npm create vite@latest junto -- --template vanilla-ts
+bunx create-vite junto --template vanilla-ts
 cd junto
-npm install
-npm run dev         # localhost:5173
-```
-
-Add Vitest:
-```bash
-npm install -D vitest
+bun install
+bun add @picocss/pico
+bun add -d vitest
+bun run dev         # localhost:5173
 ```
 
 ---
@@ -210,10 +205,10 @@ npm install -D vitest
 
 ## Notes for Claude
 
-- Always keep tools isolated in their own folder under `src/tools/`
-- Always use the shared `url-state.ts` for any shareable state — never invent a new sharing mechanism per tool
+- Always keep tools isolated in own folder under `src/tools/`
+- Always use shared `url-state.ts` for shareable state — never invent new sharing mechanism per tool
 - Prefer explicit TypeScript types over `any`
 - Keep CSS scoped per tool — no global style pollution
 - Bill splitting math: always work in **cents (integers)** internally, convert to display currency only at render time — avoids floating point bugs
-- Scheduler logic: time slots should be stored as ISO strings or Unix timestamps, not locale strings
-- When adding a new tool, stub it in the navigation first so the routing works before the tool is built
+- Scheduler logic: time slots stored as ISO strings or Unix timestamps, not locale strings
+- Adding new tool: stub in navigation first so routing works before tool is built
