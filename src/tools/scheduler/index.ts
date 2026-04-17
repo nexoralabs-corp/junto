@@ -242,12 +242,15 @@ function render(): void {
 
   const linkForm = showLinkForm ? `
     <div class="link-import-form">
-      <span class="link-import-label">${t('scheduler.add_from_link')}</span>
-      <div class="link-import-row">
-        <input id="link-input" type="url" placeholder="${t('scheduler.paste_link')}" autocomplete="off" />
-        <button class="secondary sm" id="link-import-btn">${t('scheduler.import')}</button>
+      <div class="link-import-header">
+        <span class="link-import-label">${t('scheduler.add_from_link')}</span>
         <span class="link-cancel" id="link-cancel-btn" role="button" aria-label="${t('common.remove')}">×</span>
       </div>
+      <input id="link-input" type="url" placeholder="${t('scheduler.paste_link')}" autocomplete="off" />
+      <input id="link-name-input" type="text"
+        placeholder="${t('scheduler.your_name_placeholder')}"
+        autocomplete="off" />
+      <button id="link-import-btn" class="full-width">${t('scheduler.import')}</button>
       <p id="link-error" class="feedback error" hidden></p>
     </div>` : ''
 
@@ -377,21 +380,37 @@ function render(): void {
   })
 
   root.querySelector('#link-import-btn')?.addEventListener('click', () => {
-    const input = root.querySelector<HTMLInputElement>('#link-input')!
+    const urlInput = root.querySelector<HTMLInputElement>('#link-input')!
+    const nameInput = root.querySelector<HTMLInputElement>('#link-name-input')!
     const err = root.querySelector<HTMLElement>('#link-error')!
+    err.hidden = true
+
     try {
-      const raw = input.value.trim()
-      const hash = raw.includes('#') ? raw.split('#')[1] : raw
-      const match = hash.match(/data=([^&]+)/)
+      const raw = urlInput.value.trim()
+      if (!raw) throw new Error()
+
+      // Accept full URL or just the hash fragment
+      const fragment = raw.includes('#') ? raw.split('#')[1] : raw
+      const match = fragment.match(/data=([^&\s]+)/)
       if (!match) throw new Error()
-      const decoded = JSON.parse(atob(match[1])) as SchedulerState
+
+      const b64 = decodeURIComponent(match[1])
+      const decoded = JSON.parse(atob(b64)) as SchedulerState
       if (!Array.isArray(decoded.participants) || decoded.participants.length === 0) throw new Error()
-      const added = decoded.participants.filter(p => !participants.some(ep => ep.name === p.name))
-      if (added.length === 0) throw new Error()
-      participants.push(...added)
+
+      // Merge all slots from all participants in the link into one entry
+      const allSlots = [...new Set(decoded.participants.flatMap(p => p.slots))]
+      const fallbackName = decoded.participants.find(p => p.name.trim())?.name ?? ''
+      const name = nameInput.value.trim() || fallbackName
+
+      participants.push({ name, slots: allSlots })
+      const newIdx = participants.length - 1
       showLinkForm = false
-      activeTab = 'all'
+      activeTab = newIdx
+      autoSave()
       render()
+      // Focus name input if still unnamed
+      if (!name) root.querySelector<HTMLInputElement>('#name-input')?.focus()
     } catch {
       err.hidden = false
       err.textContent = t('scheduler.import_error')
