@@ -1,3 +1,92 @@
+.sched-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  padding: 4px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-lg);
+  margin-bottom: 1rem;
+}
+
+.sched-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 11px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-2);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background 120ms, color 120ms;
+  white-space: nowrap;
+
+  &:hover { background: var(--overlay); }
+
+  &.active {
+    background: var(--accent);
+    color: #fff;
+
+    .tab-remove { color: rgba(255,255,255,0.7); &:hover { color: #fff; } }
+  }
+
+  &.add-tab {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-3);
+    padding: 4px 10px;
+    &:hover { color: var(--accent); background: var(--accent-dim); }
+  }
+
+  &.link-tab {
+    color: var(--text-3);
+    padding: 5px 9px;
+    &:hover { color: var(--accent); background: var(--accent-dim); }
+    &.active { background: var(--accent-dim); color: var(--accent); }
+  }
+}
+
+.tab-remove {
+  font-size: 0.85rem;
+  line-height: 1;
+  color: var(--text-3);
+  margin-left: 1px;
+  padding: 1px 2px;
+  border-radius: 3px;
+
+  &:hover { color: var(--error); background: rgba(220,38,38,0.08); }
+}
+
+.link-import-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 12px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-lg);
+  margin-bottom: 1rem;
+
+  input { flex: 1; min-width: 160px; margin: 0; }
+
+  .link-cancel {
+    font-size: 1.1rem;
+    color: var(--text-3);
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 4px;
+    &:hover { color: var(--error); background: rgba(220,38,38,0.08); }
+  }
+}
+
+.participant-name-field {
+  margin-bottom: 0.75rem;
+}
+
 .participants-badge {
   display: inline-flex;
   align-items: center;
@@ -60,7 +149,7 @@
   &.slot {
     background: var(--bg);
     border: 1.5px solid var(--border);
-    cursor: pointer;
+    cursor: crosshair;
     transition: background 100ms ease, border-color 100ms ease, box-shadow 100ms ease;
     user-select: none;
 
@@ -73,6 +162,17 @@
       background: var(--accent);
       border-color: var(--accent);
       box-shadow: 0 0 0 1px rgba(13, 148, 136, 0.3), 0 2px 6px rgba(13, 148, 136, 0.25);
+    }
+
+    &.partial {
+      background: rgba(5, 150, 105, calc(var(--overlap-ratio, 0) * 0.45));
+      border-color: rgba(5, 150, 105, calc(var(--overlap-ratio, 0) * 0.4));
+      cursor: default;
+    }
+
+    &.all-others {
+      background: rgba(5, 150, 105, 0.12);
+      border-color: rgba(5, 150, 105, 0.3);
     }
 
     &.others {
@@ -121,8 +221,68 @@
     border-radius: 3px;
     flex-shrink: 0;
 
-    &.mine    { background: var(--accent); }
-    &.others  { background: var(--warning); opacity: 0.65; }
-    &.overlap { background: var(--success); }
+    &.mine          { background: var(--accent); }
+    &.all-others    { background: rgba(5, 150, 105, 0.25); }
+    &.others        { background: var(--warning); opacity: 0.65; }
+    &.overlap       { background: var(--success); }
+    &.partial-legend { background: rgba(5, 150, 105, 0.3); }
   }
+}
+
+.results-panel {
+  margin-bottom: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.results-section {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 0.75rem 1rem;
+}
+
+.results-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-3);
+  margin-bottom: 0.5rem;
+
+  &.success-label { color: var(--success); }
+}
+
+.results-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.result-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: var(--r-full);
+  font-size: 0.75rem;
+  font-weight: 500;
+
+  &.overlap-chip {
+    background: rgba(5, 150, 105, 0.1);
+    color: var(--success);
+    border: 1px solid rgba(5, 150, 105, 0.25);
+  }
+
+  &.others-chip {
+    background: rgba(5, 150, 105, 0.06);
+    color: var(--text-2);
+    border: 1px solid rgba(5, 150, 105, 0.18);
+  }
+}
+
+.results-empty {
+  font-size: 0.8rem;
+  color: var(--text-3);
+  margin: 0;
 }

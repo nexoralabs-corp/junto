@@ -42,3 +42,44 @@ export function getOverlapSlots(participants: Participant[], mySlots: Set<Slot>)
   }
   return result
 }
+
+// Slots where ALL existing participants overlap (excludes current user)
+export function getExistingOverlap(participants: Participant[]): Set<Slot> {
+  if (participants.length < 2) return new Set()
+  const sets = participants.map(p => new Set(p.slots))
+  const result = new Set<Slot>()
+  for (const slot of sets[0]) {
+    if (sets.every(s => s.has(slot))) result.add(slot)
+  }
+  return result
+}
+
+// Group slots into human-readable ranges e.g. "Mon · 9am–11am"
+export function groupSlots(slots: Set<Slot> | Slot[], dayNames: string[]): string[] {
+  const arr = [...slots].map(s => {
+    const [d, h] = s.split('-').map(Number)
+    return { day: d, hour: h, slot: s }
+  })
+  arr.sort((a, b) => a.day - b.day || a.hour - b.hour)
+
+  const ranges: string[] = []
+  let i = 0
+  while (i < arr.length) {
+    const start = arr[i]
+    let end = arr[i]
+    while (
+      i + 1 < arr.length &&
+      arr[i + 1].day === start.day &&
+      arr[i + 1].hour === end.hour + 1
+    ) {
+      i++
+      end = arr[i]
+    }
+    const day = dayNames[start.day] ?? `Day ${start.day}`
+    const from = formatHour(start.hour)
+    const to = formatHour(end.hour + 1)
+    ranges.push(start.hour === end.hour ? `${day} · ${from}` : `${day} · ${from}–${to}`)
+    i++
+  }
+  return ranges
+}
