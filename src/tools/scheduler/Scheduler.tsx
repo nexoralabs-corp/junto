@@ -8,6 +8,8 @@ import {
   makeSlot, formatHour, slotCounts, getExistingOverlap, groupSlots,
   participantColor, colorRgba,
 } from './scheduler'
+import { vars } from '../../shared/utils'
+import { LinkImportForm } from './components'
 import './scheduler.scss'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -58,10 +60,6 @@ function loadSchedules(): { schedules: ScheduleEntry[]; activeId: string } {
 }
 
 // ── helpers ──────────────────────────────────────────────────────────────────
-
-function vars(v: Record<string, string>): preact.JSX.CSSProperties {
-  return v as unknown as preact.JSX.CSSProperties
-}
 
 function othersFor(participants: Participant[], idx: number): Participant[] {
   return participants.filter((_, i) => i !== idx)
@@ -132,58 +130,6 @@ function ScheduleSidebar({ schedules, activeId, onSelect, onAdd, onRemove, onRen
         </div>
       ))}
       <button class="sched-entry add-sched" onClick={onAdd}>+ {t('scheduler.new_schedule')}</button>
-    </div>
-  )
-}
-
-// ── LinkImportForm ────────────────────────────────────────────────────────────
-
-interface LinkImportFormProps {
-  onImport: (name: string, slots: string[]) => void
-  onCancel: () => void
-}
-
-function LinkImportForm({ onImport, onCancel }: LinkImportFormProps) {
-  const [url, setUrl] = useState('')
-  const [name, setName] = useState('')
-  const [error, setError] = useState('')
-  const urlRef = useRef<HTMLInputElement>(null)
-
-  useEffect(() => { urlRef.current?.focus() }, [])
-
-  function handleImport() {
-    setError('')
-    try {
-      const raw = url.trim()
-      if (!raw) throw new Error()
-      const fragment = raw.includes('#') ? raw.split('#')[1] : raw
-      const match = fragment?.match(/data=([^&\s]+)/)
-      if (!match) throw new Error()
-      const b64 = decodeURIComponent(match[1])
-      const decoded = JSON.parse(atob(b64)) as SchedulerState
-      if (!Array.isArray(decoded.participants) || decoded.participants.length === 0) throw new Error()
-      const allSlots = [...new Set(decoded.participants.flatMap(p => p.slots))]
-      const fallback = decoded.participants.find(p => p.name.trim())?.name ?? ''
-      onImport(name.trim() || fallback, allSlots)
-    } catch {
-      setError(t('scheduler.import_error'))
-    }
-  }
-
-  return (
-    <div class="link-import-form">
-      <div class="link-import-header">
-        <span class="link-import-label">{t('scheduler.add_from_link')}</span>
-        <span class="link-cancel" role="button" aria-label={t('common.remove')} onClick={onCancel}>×</span>
-      </div>
-      <input ref={urlRef} type="url" placeholder={t('scheduler.paste_link')} autocomplete="off"
-        value={url} onInput={e => setUrl((e.target as HTMLInputElement).value)}
-        onKeyDown={e => e.key === 'Enter' && handleImport()} />
-      <input type="text" placeholder={t('scheduler.your_name_placeholder')} autocomplete="off"
-        value={name} onInput={e => setName((e.target as HTMLInputElement).value)}
-        onKeyDown={e => e.key === 'Enter' && handleImport()} />
-      <button class="full-width" onClick={handleImport}>{t('scheduler.import')}</button>
-      {error && <p class="feedback error">{error}</p>}
     </div>
   )
 }

@@ -4,6 +4,7 @@ import { decodeState, buildShareUrl } from '../../shared/url-state'
 import { save, load, clear } from '../../shared/storage'
 import { copyToClipboard } from '../../shared/utils'
 import { SplitterState, Expense, settle, totalCents, fmtMoney, parseCents, nanoid } from './splitter'
+import { ExpenseItem, TxnItem } from './components'
 import './splitter.scss'
 
 const STORAGE_KEY = 'bills'
@@ -128,14 +129,14 @@ export default function BillSplitter() {
         {state.expenses.length > 0 && (
           <div class="expense-list">
             {state.expenses.map(exp => (
-              <div class="expense-item" key={exp.id}>
-                <div class="expense-info">
-                  <div class="exp-name">{exp.description}</div>
-                  <div class="exp-meta">{t('bills.exp_paid_by')}: {exp.paidBy} · {exp.participants.join(', ')}</div>
-                </div>
-                <span class="exp-amount">{fmtMoney(exp.amountCents)}</span>
-                <button class="remove-btn" onClick={() => removeExpense(exp.id)}>{t('common.remove')}</button>
-              </div>
+              <ExpenseItem
+                key={exp.id}
+                description={exp.description}
+                paidBy={exp.paidBy}
+                participants={exp.participants}
+                amountCents={exp.amountCents}
+                onRemove={() => removeExpense(exp.id)}
+              />
             ))}
           </div>
         )}
@@ -187,14 +188,7 @@ export default function BillSplitter() {
             : (
               <div class="settlement-list">
                 {txns.map((tx, i) => (
-                  <div class="txn-item" key={i}>
-                    <span class="txn-names">
-                      <strong>{tx.from}</strong>
-                      <span class="txn-arrow">→</span>
-                      <strong>{tx.to}</strong>
-                    </span>
-                    <span class="txn-amount">{fmtMoney(tx.amountCents)}</span>
-                  </div>
+                  <TxnItem key={i} from={tx.from} to={tx.to} amountCents={tx.amountCents} />
                 ))}
               </div>
             )
