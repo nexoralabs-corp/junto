@@ -10,12 +10,12 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@picocss/pico": "^2.1.1",
     "typescript": "^6.0.3",
     "vite": "^8.0.8"
   },
   "devDependencies": {
     "@vitest/ui": "^4.1.4",
+    "sass": "^1.99.0",
     "vitest": "^4.1.4"
   }
 }

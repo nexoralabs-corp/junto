@@ -212,3 +212,4 @@ bun run dev         # localhost:5173
 - Bill splitting math: always work in **cents (integers)** internally, convert to display currency only at render time — avoids floating point bugs
 - Scheduler logic: time slots stored as ISO strings or Unix timestamps, not locale strings
 - Adding new tool: stub in navigation first so routing works before tool is built
+- **i18n**: ALL user-visible strings live in `src/shared/i18n.ts` only. No hardcoded strings in tool files. Use `t('section.key')` for strings, `tArr('section.key')` for string arrays. Add keys to both `en` and `es` objects — never add to one without the other. Slot time labels (`formatHour`) are numbers so no translation needed.
