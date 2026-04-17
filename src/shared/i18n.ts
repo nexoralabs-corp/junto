@@ -16,6 +16,7 @@ const en = {
     remove: '×',
     copy_link: 'Copy link',
     copied: '✓ Copied!',
+    reset: 'Reset',
   },
   scheduler: {
     title: 'Sync Times',
@@ -43,6 +44,7 @@ const en = {
     share: 'Share',
     share_all: 'Everyone\'s schedule',
     share_one: 'Only this person',
+    new_schedule: 'New',
   },
   bills: {
     title: 'Bill Splitter',
@@ -96,6 +98,7 @@ const es: typeof en = {
     remove: '×',
     copy_link: 'Copiar link',
     copied: '✓ ¡Copiado!',
+    reset: 'Reiniciar',
   },
   scheduler: {
     title: 'Sincronizar horarios',
@@ -123,6 +126,7 @@ const es: typeof en = {
     share: 'Compartir',
     share_all: 'Horario de todos',
     share_one: 'Solo esta persona',
+    new_schedule: 'Nuevo',
   },
   bills: {
     title: 'Dividir cuenta',

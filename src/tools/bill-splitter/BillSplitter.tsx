@@ -1,12 +1,15 @@
 import { useState } from 'preact/hooks'
 import { t, toggleLang } from '../../shared/i18n'
 import { decodeState, buildShareUrl } from '../../shared/url-state'
+import { save, load, clear } from '../../shared/storage'
 import { copyToClipboard } from '../../shared/utils'
 import { SplitterState, Expense, settle, totalCents, fmtMoney, parseCents, nanoid } from './splitter'
 import './splitter.scss'
 
+const STORAGE_KEY = 'bills'
+
 function initState(): SplitterState {
-  return decodeState<SplitterState>() ?? { people: [], expenses: [] }
+  return decodeState<SplitterState>() ?? load<SplitterState>(STORAGE_KEY) ?? { people: [], expenses: [] }
 }
 
 function makeDraft(people: string[]) {
@@ -20,11 +23,25 @@ export default function BillSplitter() {
   const [copiedMsg, setCopiedMsg] = useState(false)
   const [, forceUpdate] = useState(0)
 
+  function persist(next: SplitterState) {
+    setState(next)
+    save(STORAGE_KEY, next)
+  }
+
+  function reset() {
+    const empty: SplitterState = { people: [], expenses: [] }
+    persist(empty)
+    setDraft(makeDraft([]))
+    setDraftPerson('')
+    clear(STORAGE_KEY)
+    window.history.replaceState(null, '', `${window.location.origin}${window.location.pathname}#bills`)
+  }
+
   function addPerson() {
     const name = draftPerson.trim()
     if (!name || state.people.includes(name)) return
     const next = { ...state, people: [...state.people, name] }
-    setState(next)
+    persist(next)
     setDraft(d => ({ ...d, participants: new Set([...d.participants, name]), paidBy: d.paidBy || name }))
     setDraftPerson('')
   }
@@ -34,7 +51,7 @@ export default function BillSplitter() {
     const expenses = state.expenses
       .map(exp => ({ ...exp, participants: exp.participants.filter(p => p !== name) }))
       .filter(exp => exp.participants.length > 0)
-    setState({ people, expenses })
+    persist({ people, expenses })
     setDraft(d => {
       const participants = new Set(d.participants)
       participants.delete(name)
@@ -49,12 +66,13 @@ export default function BillSplitter() {
     if (!desc || cents === 0 || participants.length === 0 || !draft.paidBy) return
     const expense: Expense = { id: nanoid(), description: desc, amountCents: cents, paidBy: draft.paidBy, participants }
     const next = { ...state, expenses: [...state.expenses, expense] }
-    setState(next)
+    persist(next)
     setDraft(d => ({ ...d, description: '', amountStr: '' }))
   }
 
   function removeExpense(id: string) {
-    setState(s => ({ ...s, expenses: s.expenses.filter(e => e.id !== id) }))
+    const next = { ...state, expenses: state.expenses.filter(e => e.id !== id) }
+    persist(next)
   }
 
   async function share() {
@@ -74,7 +92,12 @@ export default function BillSplitter() {
       <nav class="tool-nav">
         <a href="#" class="back-link">{t('common.back')}</a>
         <span class="tool-title">{t('bills.title')}</span>
-        <button class="secondary sm" onClick={() => { toggleLang(); forceUpdate(n => n + 1) }}>{t('nav.lang')}</button>
+        <div class="nav-actions">
+          {(state.people.length > 0 || state.expenses.length > 0) && (
+            <button class="secondary sm ghost" onClick={reset}>{t('common.reset')}</button>
+          )}
+          <button class="secondary sm" onClick={() => { toggleLang(); forceUpdate(n => n + 1) }}>{t('nav.lang')}</button>
+        </div>
       </nav>
 
       <p class="tool-subtitle">{t('bills.subtitle')}</p>

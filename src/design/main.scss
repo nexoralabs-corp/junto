@@ -316,6 +316,25 @@ label {
     font-weight: 700;
     color: var(--text);
   }
+
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+}
+
+.ghost {
+  background: transparent !important;
+  border-color: var(--border) !important;
+  color: var(--text-3) !important;
+  box-shadow: none !important;
+
+  &:hover {
+    border-color: var(--error) !important;
+    color: var(--error) !important;
+    background: var(--error-dim) !important;
+  }
 }
 
 .tool-subtitle {
