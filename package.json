@@ -1,0 +1,21 @@
+{
+  "name": "junto",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "@picocss/pico": "^2.1.1",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.8"
+  },
+  "devDependencies": {
+    "@vitest/ui": "^4.1.4",
+    "vitest": "^4.1.4"
+  }
+}
