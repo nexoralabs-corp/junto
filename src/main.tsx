@@ -6,6 +6,56 @@ import { t, toggleLang } from './shared/i18n'
 import Scheduler from './tools/scheduler/Scheduler'
 import BillSplitter from './tools/bill-splitter/BillSplitter'
 
+// Repeated info button SVG extracted into component
+function InfoButton() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="7.5" cy="7.5" r="6.75" stroke="currentColor" stroke-width="1.5"/>
+      <rect x="7" y="6.5" width="1" height="4.5" rx="0.5" fill="currentColor"/>
+      <rect x="6.75" y="4" width="1.5" height="1.5" rx="0.75" fill="currentColor"/>
+    </svg>
+  )
+}
+
+function Modal({ icon, title, desc, steps, note }: {
+  icon: string
+  title: string
+  desc: string
+  steps: string[]
+  note: string
+}) {
+  const backdrop = document.createElement('div')
+  backdrop.className = 'modal-backdrop'
+  backdrop.innerHTML = `
+    <div class="modal" role="dialog" aria-modal="true" aria-label="${title}">
+      <button class="modal-close" id="modal-close" aria-label="${t('modal.close')}">×</button>
+      <div class="modal-header">
+        <div class="modal-icon">${icon}</div>
+        <h2>${title}</h2>
+      </div>
+      <p class="modal-desc">${desc}</p>
+      <div class="modal-section-title">${t('modal.how_it_works')}</div>
+      <ol class="modal-steps">
+        ${steps.map(s => `<li>${s}</li>`).join('')}
+      </ol>
+      <div class="modal-section-title">${t('modal.good_to_know')}</div>
+      <div class="modal-note">${note}</div>
+    </div>
+  `
+  document.body.appendChild(backdrop)
+  requestAnimationFrame(() => backdrop.classList.add('open'))
+  const close = () => {
+    backdrop.classList.remove('open')
+    backdrop.addEventListener('transitionend', () => backdrop.remove(), { once: true })
+  }
+  backdrop.addEventListener('click', e => { if (e.target === backdrop) close() })
+  backdrop.querySelector('#modal-close')!.addEventListener('click', close)
+  const onKey = (e: KeyboardEvent) => {
+    if (e.key === 'Escape') { close(); document.removeEventListener('keydown', onKey) }
+  }
+  document.addEventListener('keydown', onKey)
+}
+
 function App() {
   const [hash, setHash] = useState(() => window.location.hash.replace('#', '').split('&')[0])
 
@@ -25,46 +75,17 @@ function Home() {
 
   function openModal(tool: 'scheduler' | 'bills') {
     const isScheduler = tool === 'scheduler'
-    const icon = isScheduler ? '📅' : '💸'
-    const title = t(isScheduler ? 'nav.scheduler' : 'nav.bills')
-    const desc = t(isScheduler ? 'modal.scheduler_desc' : 'modal.bills_desc')
-    const step1 = t(isScheduler ? 'modal.scheduler_step1' : 'modal.bills_step1')
-    const step2 = t(isScheduler ? 'modal.scheduler_step2' : 'modal.bills_step2')
-    const step3 = t(isScheduler ? 'modal.scheduler_step3' : 'modal.bills_step3')
-    const note = t(isScheduler ? 'modal.scheduler_note' : 'modal.bills_note')
-
-    const backdrop = document.createElement('div')
-    backdrop.className = 'modal-backdrop'
-    backdrop.innerHTML = `
-      <div class="modal" role="dialog" aria-modal="true" aria-label="${title}">
-        <button class="modal-close" id="modal-close" aria-label="${t('modal.close')}">×</button>
-        <div class="modal-header">
-          <div class="modal-icon">${icon}</div>
-          <h2>${title}</h2>
-        </div>
-        <p class="modal-desc">${desc}</p>
-        <div class="modal-section-title">${t('modal.how_it_works')}</div>
-        <ol class="modal-steps">
-          <li>${step1}</li>
-          <li>${step2}</li>
-          <li>${step3}</li>
-        </ol>
-        <div class="modal-section-title">${t('modal.good_to_know')}</div>
-        <div class="modal-note">${note}</div>
-      </div>
-    `
-    document.body.appendChild(backdrop)
-    requestAnimationFrame(() => backdrop.classList.add('open'))
-    const close = () => {
-      backdrop.classList.remove('open')
-      backdrop.addEventListener('transitionend', () => backdrop.remove(), { once: true })
-    }
-    backdrop.addEventListener('click', e => { if (e.target === backdrop) close() })
-    backdrop.querySelector('#modal-close')!.addEventListener('click', close)
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') { close(); document.removeEventListener('keydown', onKey) }
-    }
-    document.addEventListener('keydown', onKey)
+    Modal({
+      icon: isScheduler ? '📅' : '💸',
+      title: t(isScheduler ? 'nav.scheduler' : 'nav.bills'),
+      desc: t(isScheduler ? 'modal.scheduler_desc' : 'modal.bills_desc'),
+      steps: [
+        t(isScheduler ? 'modal.scheduler_step1' : 'modal.bills_step1'),
+        t(isScheduler ? 'modal.scheduler_step2' : 'modal.bills_step2'),
+        t(isScheduler ? 'modal.scheduler_step3' : 'modal.bills_step3')
+      ],
+      note: t(isScheduler ? 'modal.scheduler_note' : 'modal.bills_note')
+    })
   }
 
   return (
@@ -94,11 +115,7 @@ function Home() {
               <div class="tool-desc">Find when everyone is free</div>
             </div>
             <button class="info-btn" title="Learn more" onClick={e => { e.preventDefault(); e.stopPropagation(); openModal('scheduler') }}>
-              <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="7.5" cy="7.5" r="6.75" stroke="currentColor" stroke-width="1.5"/>
-                <rect x="7" y="6.5" width="1" height="4.5" rx="0.5" fill="currentColor"/>
-                <rect x="6.75" y="4" width="1.5" height="1.5" rx="0.75" fill="currentColor"/>
-              </svg>
+              <InfoButton />
             </button>
           </a>
           <a href="#bills" class="tool-card">
@@ -108,11 +125,7 @@ function Home() {
               <div class="tool-desc">Split expenses, settle up</div>
             </div>
             <button class="info-btn" title="Learn more" onClick={e => { e.preventDefault(); e.stopPropagation(); openModal('bills') }}>
-              <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="7.5" cy="7.5" r="6.75" stroke="currentColor" stroke-width="1.5"/>
-                <rect x="7" y="6.5" width="1" height="4.5" rx="0.5" fill="currentColor"/>
-                <rect x="6.75" y="4" width="1.5" height="1.5" rx="0.75" fill="currentColor"/>
-              </svg>
+              <InfoButton />
             </button>
           </a>
         </div>
