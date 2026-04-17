@@ -11,10 +11,12 @@
   },
   "dependencies": {
     "@fontsource-variable/plus-jakarta-sans": "^5.2.8",
+    "preact": "^10.29.1",
     "typescript": "^6.0.3",
     "vite": "^8.0.8"
   },
   "devDependencies": {
+    "@preact/preset-vite": "^2.10.5",
     "@vitest/ui": "^4.1.4",
     "sass": "^1.99.0",
     "vitest": "^4.1.4"
