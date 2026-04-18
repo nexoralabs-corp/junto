@@ -67,6 +67,8 @@ const en = {
     need_people: 'Add at least 2 people to start.',
     total: 'Total',
     participants_label: 'Who was involved:',
+    select_all: 'All',
+    deselect_all: 'None',
   },
   modal: {
     close: 'Close',
@@ -150,6 +152,8 @@ const es: typeof en = {
     need_people: 'Agrega al menos 2 personas para comenzar.',
     total: 'Total',
     participants_label: 'Quiénes participaron:',
+    select_all: 'Todos',
+    deselect_all: 'Ninguno',
   },
   modal: {
     close: 'Cerrar',

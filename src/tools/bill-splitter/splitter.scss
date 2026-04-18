@@ -121,11 +121,23 @@
     }
   }
 
+  .participants-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+
+    .participants-actions {
+      display: flex;
+      gap: 4px;
+    }
+  }
+
   .checkbox-label {
     font-size: 0.8rem;
     font-weight: 600;
     color: var(--text-2);
-    margin-bottom: 4px;
+    margin-bottom: 0;
   }
 
   .checkbox-list {

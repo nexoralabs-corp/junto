@@ -6,6 +6,7 @@ import { copyToClipboard } from '../../shared/utils'
 import { SplitterState, Expense, settle, totalCents, fmtMoney, parseCents, nanoid } from './splitter'
 import { ExpenseItem, TxnItem } from './components'
 import { ToolNav } from '../../shared/components/nav'
+import { SecondaryButton } from '../../shared/components/buttons'
 import './splitter.scss'
 
 const STORAGE_KEY = 'bills'
@@ -166,7 +167,17 @@ export default function BillSplitter() {
                 </div>
               </div>
               <div class="form-group">
-                <label class="checkbox-label">{t('bills.participants_label')}</label>
+                <div class="participants-header">
+                  <label class="checkbox-label">{t('bills.participants_label')}</label>
+                  <div class="participants-actions">
+                    <SecondaryButton sm onClick={() => setDraft(d => ({ ...d, participants: new Set(state.people) }))}>
+                      {t('bills.select_all')}
+                    </SecondaryButton>
+                    <SecondaryButton sm onClick={() => setDraft(d => ({ ...d, participants: new Set<string>() }))}>
+                      {t('bills.deselect_all')}
+                    </SecondaryButton>
+                  </div>
+                </div>
                 <div class="checkbox-list">
                   {state.people.map(p => (
                     <label key={p} class="checkbox-item">
