@@ -231,6 +231,51 @@
   }
 }
 
+.currency-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+
+  .currency-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-right: 2px;
+  }
+
+  .currency-btn {
+    padding: 4px 10px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border-radius: var(--r-sm);
+    background: var(--surface);
+    border: 1.5px solid var(--border-2);
+    color: var(--text-3);
+    cursor: pointer;
+    transition: all 150ms ease;
+    box-shadow: none;
+
+    &:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-dim);
+      box-shadow: none;
+    }
+
+    &:active { transform: scale(0.96); }
+
+    &.active {
+      background: var(--accent-dim);
+      border-color: var(--accent-border);
+      color: var(--accent);
+    }
+  }
+}
+
 .settlement-list {
   display: flex;
   flex-direction: column;
@@ -247,11 +292,19 @@
   border: 1.5px solid var(--border);
   border-radius: var(--r-md);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-  transition: border-color 180ms ease, box-shadow 180ms ease;
+  transition: border-color 180ms ease, box-shadow 180ms ease, opacity 180ms ease;
 
   &:hover {
     border-color: var(--border-2);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  &.txn-paid {
+    opacity: 0.5;
+    border-color: var(--success);
+
+    .txn-names { text-decoration: line-through; }
+    .txn-amount { color: var(--text-3); }
   }
 
   .txn-names {
@@ -275,11 +328,47 @@
     flex-shrink: 0;
   }
 
+  .txn-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
   .txn-amount {
     font-size: 1rem;
     font-weight: 700;
     color: var(--success);
     white-space: nowrap;
+  }
+
+  .txn-paid-btn {
+    font-size: 0.75rem;
+    padding: 3px 9px;
+    border-radius: var(--r-sm);
+    border: 1.5px solid var(--border-2);
+    background: none;
+    color: var(--text-3);
+    cursor: pointer;
+    transition: all 150ms ease;
+    white-space: nowrap;
+    box-shadow: none;
+    flex-shrink: 0;
+
+    &:hover {
+      border-color: var(--success);
+      color: var(--success);
+      background: var(--success-dim);
+      box-shadow: none;
+    }
+
+    &:active { transform: scale(0.95); }
+
+    &.is-paid {
+      border-color: var(--success);
+      color: var(--success);
+      background: var(--success-dim);
+    }
   }
 }
 

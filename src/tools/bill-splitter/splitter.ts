@@ -1,3 +1,5 @@
+export type Currency = 'USD' | 'EUR' | 'PEN'
+
 export type Expense = {
   id: string
   description: string
@@ -9,6 +11,8 @@ export type Expense = {
 export type SplitterState = {
   people: string[]
   expenses: Expense[]
+  paidTxns?: string[]
+  currency?: Currency
 }
 
 export type Transaction = {
@@ -70,8 +74,15 @@ export function totalCents(expenses: Expense[]): number {
   return expenses.reduce((sum, e) => sum + e.amountCents, 0)
 }
 
-export function fmtMoney(cents: number): string {
-  return '$' + (cents / 100).toFixed(2)
+export function txnKey(tx: Transaction): string {
+  return `${tx.from}>${tx.to}:${tx.amountCents}`
+}
+
+export function fmtMoney(cents: number, currency: Currency = 'USD'): string {
+  const val = (cents / 100).toFixed(2)
+  if (currency === 'EUR') return `€${val}`
+  if (currency === 'PEN') return `S/ ${val}`
+  return `$${val}`
 }
 
 export function parseCents(str: string): number {

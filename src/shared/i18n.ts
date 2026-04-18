@@ -69,6 +69,10 @@ const en = {
     participants_label: 'Who was involved:',
     select_all: 'All',
     deselect_all: 'None',
+    mark_paid: 'Mark paid',
+    paid: '✓ Paid',
+    consolidate: 'Consolidate',
+    currency: 'Currency',
   },
   modal: {
     close: 'Close',
@@ -154,6 +158,10 @@ const es: typeof en = {
     participants_label: 'Quiénes participaron:',
     select_all: 'Todos',
     deselect_all: 'Ninguno',
+    mark_paid: 'Marcar pagado',
+    paid: '✓ Pagado',
+    consolidate: 'Consolidar',
+    currency: 'Moneda',
   },
   modal: {
     close: 'Cerrar',

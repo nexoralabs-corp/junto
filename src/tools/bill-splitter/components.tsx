@@ -1,11 +1,12 @@
 import { t } from '../../shared/i18n'
-import { fmtMoney } from './splitter'
+import { fmtMoney, Currency } from './splitter'
 
-export function ExpenseItem({ description, paidBy, participants, amountCents, onRemove }: {
+export function ExpenseItem({ description, paidBy, participants, amountCents, currency, onRemove }: {
   description: string
   paidBy: string
   participants: string[]
   amountCents: number
+  currency?: Currency
   onRemove?: () => void
 }) {
   return (
@@ -14,21 +15,35 @@ export function ExpenseItem({ description, paidBy, participants, amountCents, on
         <div class="exp-name">{description}</div>
         <div class="exp-meta">{t('bills.exp_paid_by')}: {paidBy} · {participants.join(', ')}</div>
       </div>
-      <span class="exp-amount">{fmtMoney(amountCents)}</span>
+      <span class="exp-amount">{fmtMoney(amountCents, currency)}</span>
       {onRemove && <button class="remove-btn" onClick={onRemove}>{t('common.remove')}</button>}
     </div>
   )
 }
 
-export function TxnItem({ from, to, amountCents }: { from: string; to: string; amountCents: number }) {
+export function TxnItem({ from, to, amountCents, currency, paid, onTogglePaid }: {
+  from: string
+  to: string
+  amountCents: number
+  currency?: Currency
+  paid?: boolean
+  onTogglePaid?: () => void
+}) {
   return (
-    <div class="txn-item">
+    <div class={`txn-item${paid ? ' txn-paid' : ''}`}>
       <span class="txn-names">
         <strong>{from}</strong>
         <span class="txn-arrow">→</span>
         <strong>{to}</strong>
       </span>
-      <span class="txn-amount">{fmtMoney(amountCents)}</span>
+      <div class="txn-right">
+        <span class="txn-amount">{fmtMoney(amountCents, currency)}</span>
+        {onTogglePaid && (
+          <button class={`txn-paid-btn${paid ? ' is-paid' : ''}`} onClick={onTogglePaid}>
+            {paid ? t('bills.paid') : t('bills.mark_paid')}
+          </button>
+        )}
+      </div>
     </div>
   )
 }

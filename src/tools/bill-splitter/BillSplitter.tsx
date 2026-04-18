@@ -3,7 +3,7 @@ import { t, toggleLang } from '../../shared/i18n'
 import { decodeState, buildShareUrl } from '../../shared/url-state'
 import { save, load, clear } from '../../shared/storage'
 import { copyToClipboard } from '../../shared/utils'
-import { SplitterState, Expense, settle, totalCents, fmtMoney, parseCents, nanoid } from './splitter'
+import { SplitterState, Expense, Currency, settle, totalCents, fmtMoney, parseCents, nanoid, txnKey } from './splitter'
 import { ExpenseItem, TxnItem } from './components'
 import { ToolNav } from '../../shared/components/nav'
 import { SecondaryButton } from '../../shared/components/buttons'
@@ -80,6 +80,20 @@ export default function BillSplitter() {
     persist(next)
   }
 
+  function togglePaid(key: string) {
+    const paidTxns = state.paidTxns ?? []
+    const next = paidTxns.includes(key) ? paidTxns.filter(k => k !== key) : [...paidTxns, key]
+    persist({ ...state, paidTxns: next })
+  }
+
+  function consolidate() {
+    persist({ ...state, paidTxns: txns.map(txnKey) })
+  }
+
+  function setCurrency(currency: Currency) {
+    persist({ ...state, currency })
+  }
+
   async function share() {
     const url = buildShareUrl('bills', state)
     window.history.replaceState(null, '', url)
@@ -87,13 +101,16 @@ export default function BillSplitter() {
     setCopiedMsg(true)
     setTimeout(() => setCopiedMsg(false), 2500)
   }
+  const currency = state.currency ?? 'USD'
   const total = totalCents(state.expenses)
   const hasPeople = state.people.length >= 2
   const txns = state.expenses.length > 0 ? settle(state) : []
+  const paidTxns = state.paidTxns ?? []
+  const allPaid = txns.length > 0 && txns.every(tx => paidTxns.includes(txnKey(tx)))
 
   return (
     <div class="page">
-      <ToolNav 
+      <ToolNav
         onBack={reset}
         title={t('bills.title')}
         subtitle={t('bills.subtitle')}
@@ -105,6 +122,19 @@ export default function BillSplitter() {
           <button class="secondary sm" onClick={() => toggleLang()}>{t('nav.lang')}</button>
         </div>
       </ToolNav>
+
+      <div class="currency-bar">
+        <span class="currency-label">{t('bills.currency')}:</span>
+        {(['USD', 'EUR', 'PEN'] as Currency[]).map(c => (
+          <button
+            key={c}
+            class={`currency-btn${currency === c ? ' active' : ''}`}
+            onClick={() => setCurrency(c)}
+          >
+            {c === 'USD' ? '$ USD' : c === 'EUR' ? '€ EUR' : 'S/ PEN'}
+          </button>
+        ))}
+      </div>
 
       {/* People */}
       <section class="section">
@@ -203,6 +233,7 @@ export default function BillSplitter() {
                   paidBy={exp.paidBy}
                   participants={exp.participants}
                   amountCents={exp.amountCents}
+                  currency={currency}
                   onRemove={() => removeExpense(exp.id)}
                 />
               ))}
@@ -214,17 +245,34 @@ export default function BillSplitter() {
       {/* Settlement */}
       {state.expenses.length > 0 && (
         <section class="section">
-          <p class="total-line">{t('bills.total')}: <strong>{fmtMoney(total)}</strong></p>
+          <p class="total-line">{t('bills.total')}: <strong>{fmtMoney(total, currency)}</strong></p>
           {txns.length === 0
             ? <p class="all-settled">{t('bills.all_settled')}</p>
             : (
-              <Accordion title={t('bills.settlement')}>
-                <div class="settlement-list">
-                  {txns.map((tx, i) => (
-                    <TxnItem key={i} from={tx.from} to={tx.to} amountCents={tx.amountCents} />
-                  ))}
-                </div>
-              </Accordion>
+              <>
+                {allPaid && <p class="all-settled">{t('bills.all_settled')}</p>}
+                <Accordion title={t('bills.settlement')} defaultOpen open={!allPaid}>
+                  <div class="settlement-list">
+                    {txns.map((tx, i) => {
+                      const key = txnKey(tx)
+                      return (
+                        <TxnItem
+                          key={i}
+                          from={tx.from}
+                          to={tx.to}
+                          amountCents={tx.amountCents}
+                          currency={currency}
+                          paid={paidTxns.includes(key)}
+                          onTogglePaid={() => togglePaid(key)}
+                        />
+                      )
+                    })}
+                  </div>
+                  {txns.length > 1 && (
+                    <button class="secondary full-width" onClick={consolidate}>{t('bills.consolidate')}</button>
+                  )}
+                </Accordion>
+              </>
             )
           }
           <button class="full-width" onClick={share}>{t('bills.share')}</button>
