@@ -27,6 +27,7 @@ export default function BillSplitter() {
   const [addingPerson, setAddingPerson] = useState(false)
   const [copiedMsg, setCopiedMsg] = useState(false)
   const [settlementOpen, setSettlementOpen] = useState(true)
+  const [, forceUpdate] = useState(0)
 
   function persist(next: SplitterState) {
     setState(next)
@@ -119,9 +120,9 @@ export default function BillSplitter() {
       >
         <div class="nav-actions">
           {(state.people.length > 0 || state.expenses.length > 0) && (
-            <button class="secondary sm ghost">{t('common.reset')}</button>
+            <button class="secondary sm ghost" onClick={reset}>{t('common.reset')}</button>
           )}
-          <button class="secondary sm" onClick={() => toggleLang()}>{t('nav.lang')}</button>
+          <button class="secondary sm" onClick={() => { toggleLang(); forceUpdate(n => n + 1) }}>{t('nav.lang')}</button>
         </div>
       </ToolNav>
 
