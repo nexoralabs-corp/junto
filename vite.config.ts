@@ -2,7 +2,7 @@ import { defineConfig } from 'vitest/config'
 import preact from '@preact/preset-vite'
 
 export default defineConfig({
-  base: '/junto/',
+  base: '/',
   plugins: [preact()],
   build: {
     outDir: 'dist',
