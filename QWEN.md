@@ -1,4 +1,4 @@
-# Junto — Project Brief for Claude
+# Junto — Project Brief for Qwen Code
 
 ## What is Junto?
 
@@ -28,7 +28,7 @@ Name from old word for small group with shared purpose. That vibe.
 | Package manager | **Bun** | Faster installs + runs, replaces npm/node |
 | Language | **TypeScript** | Safety as codebase grows across multiple tools |
 | UI | **Vanilla TS** + **PicoCSS** | No JS framework, PicoCSS handles base styling (~10kb classless CSS) |
-| Styling | `tokens.css` overrides PicoCSS vars | Consistent look across all tools |
+| Styling | `main.scss` with CSS variables | Consistent look across all tools via token system |
 | Testing | **Vitest** | Easy unit tests for math-heavy logic (splits, overlaps) |
 | Deployment | **GitHub Pages** | Free, static, no server needed |
 
@@ -44,23 +44,32 @@ junto/
 ├── vite.config.ts
 ├── tsconfig.json
 ├── src/
-│   ├── main.ts              ← Entry point, router
+│   ├── main.tsx             ← Entry point, router, mobile nav
 │   ├── shared/
-│   │   ├── url-state.ts     ← Encode/decode state in URL hash (shared by all tools)
-│   │   ├── storage.ts       ← localStorage helpers (optional persistence)
-│   │   └── utils.ts         ← Date helpers, currency formatters, etc.
+│   │   ├── components/      ← Shared UI components
+│   │   │   ├── buttons.tsx  ← InfoButton, PrimaryButton, SecondaryButton
+│   │   │   ├── display.tsx  ← Logo, Chip, Section, Feedback
+│   │   │   ├── forms.tsx    ← TextInput, NumberInput, Select, CheckboxLabel
+│   │   │   ├── modal.tsx    ← Modal component
+│   │   │   └── nav.tsx      ← ToolNav (shared navigation header)
+│   │   ├── components.tsx   ← Barrel export for all shared components
+│   │   ├── i18n.ts          ← ALL user-visible strings (en + es)
+│   │   ├── storage.ts       ← localStorage helpers
+│   │   ├── url-state.ts     ← Encode/decode state in URL hash
+│   │   └── utils.ts         ← formatCurrency, intersect, copyToClipboard, vars
 │   ├── design/
-│   │   └── tokens.css       ← Colors, spacing, typography — used by all tools
+│   │   └── main.scss        ← Global styles + responsive breakpoints
 │   └── tools/
 │       ├── scheduler/       ← Sync Times tool
-│       │   ├── index.ts
-│       │   ├── scheduler.ts
-│       │   └── scheduler.css
-│       ├── bill-splitter/   ← Bill Splitter tool
-│       │   ├── index.ts
-│       │   ├── splitter.ts
-│       │   └── splitter.css
-│       └── [future-tool]/   ← Each new tool is an isolated folder
+│       │   ├── Scheduler.tsx
+│       │   ├── scheduler.ts (logic)
+│       │   ├── scheduler.scss
+│       │   └── components.tsx (tool-specific)
+│       └── bill-splitter/   ← Bill Splitter tool
+│           ├── BillSplitter.tsx
+│           ├── splitter.ts (logic)
+│           ├── splitter.scss
+│           └── components.tsx (tool-specific)
 └── public/
     └── favicon.svg
 ```
@@ -73,17 +82,13 @@ junto/
 Backbone of sharing. Every tool serializes state into compressed, base64-encoded URL hash. Sharing = copy URL.
 
 ```ts
-// Encode any object into the URL hash
 export function encodeState<T>(state: T): string
-
-// Decode URL hash back into an object
 export function decodeState<T>(): T | null
-
-// Example URL: junto.app/#tool=scheduler&data=eyJuYW1lIjoiQWxleCIsInNsb3RzIjpbXX0=
+export function buildShareUrl(tool: 'scheduler' | 'bills', state: any): string
 ```
 
 ### `storage.ts`
-Thin wrapper around localStorage for optional local persistence (e.g., remembering name between sessions).
+Thin wrapper around localStorage for optional local persistence.
 
 ```ts
 export function save<T>(key: string, value: T): void
@@ -93,10 +98,10 @@ export function clear(key: string): void
 
 ### `utils.ts`
 Shared helpers — no reinventing per tool:
-- Date/time formatting
-- Currency formatting and rounding (important for bill splitting)
-- Array intersection (important for scheduler)
-- Copy to clipboard helper
+- `formatCurrency(cents, currency)` — currency formatting
+- `intersect<T>(arrays: T[][])` — array intersection (scheduler overlap)
+- `copyToClipboard(text)` — clipboard helper
+- `vars(v)` — inline style helper for dynamic colors
 
 ---
 
@@ -169,12 +174,34 @@ junto.app/#scheduler&data=... → Scheduler with pre-loaded state
 
 ---
 
-## Deployment
+## Design System
 
-```bash
-bun run build       # outputs to /dist
-# deploy /dist to GitHub Pages (via Actions)
+### CSS Variables (`main.scss`)
+
+```scss
+--bg:       #F8FAFC;
+--surface:  #FFFFFF;
+--elevated: #E8F0FE;
+--accent:   #4F46E5;    // indigo-600
+--success:  #059669;    // emerald-600
+--warning:  #F59E0B;    // amber-500
+--error:    #DC2626;    // red-600
+--text:     #1E293B;
+--text-2:   #475569;
+--text-3:   #94A3B8;
 ```
+
+### Typography
+
+- Font: **Plus Jakarta Sans Variable** (via @fontsource-variable)
+- Base size: 15px
+- Headings: Tight tracking, bold weights
+
+### Responsive Breakpoints
+
+- Mobile: ≤ 480px
+- Tablet: 481–768px
+- Desktop: ≥ 769px
 
 ---
 
@@ -184,10 +211,17 @@ bun run build       # outputs to /dist
 bunx create-vite junto --template vanilla-ts
 cd junto
 bun install
-bun add @picocss/pico
-bun add -d vitest
 bun run dev         # localhost:5173
 ```
+
+### Commands
+
+| Command | Description |
+|---|---|
+| `bun run dev` | Start dev server with hot reload |
+| `bun run build` | Build for production (outputs to /dist) |
+| `bun run preview` | Preview production build locally |
+| `bun run test` | Run Vitest tests |
 
 ---
 
@@ -203,7 +237,58 @@ bun run dev         # localhost:5173
 
 ---
 
-## Notes for Claude
+## Development Conventions
+
+### Code Organization
+
+- **Tools are isolated** — each tool lives in its own folder under `src/tools/`
+- **Shared components first** — check `src/shared/components/` before creating new component
+- **TypeScript strict mode** — explicit types, no `any`, no unused vars/params
+- **CSS scoping** — per-tool SCSS files, no global style pollution
+
+### i18n (Internationalization)
+
+- **ALL user-visible strings live in `src/shared/i18n.ts` only**
+- Use `t('section.key')` for single strings, `tArr('section.key')` for arrays
+- Add keys to both `en` and `es` objects — never add to one without the other
+- Slot time labels (e.g., formatHour) are numbers so no translation needed
+
+### Components Pattern
+
+```tsx
+// Shared components (src/shared/components/)
+import { Logo, Chip, Section } from '../../shared/components'
+
+// Tool-specific components (src/tools/*/components.tsx)
+import { ExpenseItem, TxnItem } from './components'
+```
+
+**Never duplicate a component** — extend or add to the right file instead.
+
+### Math & Currency
+
+- **Bill splitting**: Always work in **cents (integers)** internally, convert to display currency only at render time
+- Avoid floating point bugs by using integer arithmetic for all calculations
+
+### Git Commits
+
+- Never add `Co-authored-by` lines to commit messages
+- Always use your own author identity (git config or system user)
+
+---
+
+## Building & Deploying
+
+```bash
+bun run build       # outputs to /dist
+# deploy /dist to GitHub Pages (via Actions), Netlify, Vercel, or Cloudflare Pages
+```
+
+Base path is configured in `vite.config.ts` as `/junto/` for GitHub Pages.
+
+---
+
+## Notes for Qwen
 
 - Always keep tools isolated in own folder under `src/tools/`
 - Always use shared `url-state.ts` for shareable state — never invent new sharing mechanism per tool
@@ -212,6 +297,6 @@ bun run dev         # localhost:5173
 - Bill splitting math: always work in **cents (integers)** internally, convert to display currency only at render time — avoids floating point bugs
 - Scheduler logic: time slots stored as ISO strings or Unix timestamps, not locale strings
 - Adding new tool: stub in navigation first so routing works before tool is built
-- **i18n**: ALL user-visible strings live in `src/shared/i18n.ts` only. No hardcoded strings in tool files. Use `t('section.key')` for strings, `tArr('section.key')` for string arrays. Add keys to both `en` and `es` objects — never add to one without the other. Slot time labels (`formatHour`) are numbers so no translation needed.
-- **Components — be DRY**: Before writing any UI element, check `src/shared/components/` first. Shared components: `buttons.tsx` (InfoButton, PrimaryButton, SecondaryButton), `display.tsx` (Logo, Chip, Section, Feedback), `forms.tsx` (TextInput, NumberInput, Select, CheckboxLabel, FieldGroup, FormRow), `modal.tsx` (Modal), `nav.tsx` (ToolNav). Tool-specific components live in their own folder: `src/tools/scheduler/components.tsx`, `src/tools/bill-splitter/components.tsx`. Never duplicate a component — extend or add to the right file instead. `src/shared/components.tsx` is a re-export barrel; import from it or from the specific sub-file.
-- **Git commits**: Never add Co-authored-by lines to commit messages. Always use your own author identity (git config or system user).
+- **i18n**: ALL user-visible strings live in `src/shared/i18n.ts` only. No hardcoded strings in tool files. Use `t('section.key')` for strings, `tArr('section.key')` for string arrays. Add keys to both `en` and `es` objects — never add to one without the other.
+- **Components — be DRY**: Before writing any UI element, check `src/shared/components/` first. Shared components: `buttons.tsx`, `display.tsx`, `forms.tsx`, `modal.tsx`, `nav.tsx`. Tool-specific components live in their own folder. Never duplicate a component — extend or add to the right file instead.
+- **Git commits**: Never add Co-authored-by lines to commit messages. Always use your own author identity.
