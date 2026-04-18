@@ -23,6 +23,7 @@ export default function BillSplitter() {
   const [state, setState] = useState<SplitterState>(initState)
   const [draft, setDraft] = useState(() => makeDraft(initState().people))
   const [draftPerson, setDraftPerson] = useState('')
+  const [addingPerson, setAddingPerson] = useState(false)
   const [copiedMsg, setCopiedMsg] = useState(false)
 
   function persist(next: SplitterState) {
@@ -41,11 +42,12 @@ export default function BillSplitter() {
 
   function addPerson() {
     const name = draftPerson.trim()
-    if (!name || state.people.includes(name)) return
+    if (!name || state.people.includes(name)) { setDraftPerson(''); setAddingPerson(false); return }
     const next = { ...state, people: [...state.people, name] }
     persist(next)
     setDraft(d => ({ ...d, participants: new Set([...d.participants, name]), paidBy: d.paidBy || name }))
     setDraftPerson('')
+    setAddingPerson(false)
   }
 
   function removePerson(name: string) {
@@ -113,14 +115,21 @@ export default function BillSplitter() {
               <button class="chip-remove" onClick={() => removePerson(p)}>{t('common.remove')}</button>
             </span>
           ))}
+          {!addingPerson && (
+            <button class="chip chip-add" onClick={() => setAddingPerson(true)}>+</button>
+          )}
         </div>
-        <div class="add-row">
-          <input type="text" placeholder={t('bills.person_placeholder')}
-            value={draftPerson} autocomplete="off"
-            onInput={e => setDraftPerson((e.target as HTMLInputElement).value)}
-            onKeyDown={e => e.key === 'Enter' && addPerson()} />
-          <button class="secondary" onClick={addPerson}>{t('common.add')}</button>
-        </div>
+        {addingPerson && (
+          <div class="add-row">
+            <input type="text" placeholder={t('bills.person_placeholder')}
+              value={draftPerson} autocomplete="off"
+              ref={(el: HTMLInputElement | null) => { if (el) el.focus() }}
+              onInput={e => setDraftPerson((e.target as HTMLInputElement).value)}
+              onKeyDown={e => { if (e.key === 'Enter') addPerson(); if (e.key === 'Escape') { setDraftPerson(''); setAddingPerson(false); } }}
+              onBlur={() => { if (!draftPerson.trim()) { setDraftPerson(''); setAddingPerson(false); } }} />
+            <button class="secondary" onClick={addPerson}>{t('common.add')}</button>
+          </div>
+        )}
       </section>
 
       {/* Expenses */}
