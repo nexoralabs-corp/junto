@@ -25,6 +25,7 @@ export default function BillSplitter() {
   const [draft, setDraft] = useState(() => makeDraft(initState().people))
   const [draftPerson, setDraftPerson] = useState('')
   const [addingPerson, setAddingPerson] = useState(false)
+  const [draftErrors, setDraftErrors] = useState<{ description?: string; amount?: string; participants?: string }>({})
   const [copiedMsg, setCopiedMsg] = useState(false)
   const [settlementOpen, setSettlementOpen] = useState(true)
   const [, forceUpdate] = useState(0)
@@ -70,7 +71,12 @@ export default function BillSplitter() {
     const desc = draft.description.trim()
     const cents = parseCents(draft.amountStr)
     const participants = [...draft.participants].filter(p => state.people.includes(p))
-    if (!desc || cents === 0 || participants.length === 0 || !draft.paidBy) return
+    const errors: typeof draftErrors = {}
+    if (!desc) errors.description = t('bills.err_description')
+    if (cents === 0) errors.amount = t('bills.err_amount')
+    if (participants.length === 0) errors.participants = t('bills.err_participants')
+    if (Object.keys(errors).length > 0) { setDraftErrors(errors); return }
+    setDraftErrors({})
     const expense: Expense = { id: nanoid(), description: desc, amountCents: cents, paidBy: draft.paidBy, participants }
     const next = { ...state, expenses: [...state.expenses, expense] }
     persist(next)
@@ -176,14 +182,24 @@ export default function BillSplitter() {
                 <div class="form-group">
                   <input type="text" placeholder={t('bills.exp_description_placeholder')}
                     value={draft.description} autocomplete="off"
-                    onInput={e => setDraft(d => ({ ...d, description: (e.target as HTMLInputElement).value }))} />
+                    onKeyDown={e => { if (e.key === 'Enter') addExpense() }}
+                    onInput={e => {
+                      setDraft(d => ({ ...d, description: (e.target as HTMLInputElement).value }))
+                      if (draftErrors.description) setDraftErrors(d => ({ ...d, description: undefined }))
+                    }} />
+                  {draftErrors.description && <span class="field-error">{draftErrors.description}</span>}
                 </div>
                 <div class="form-row">
                   <div class="form-field">
                     <label for="exp-amount" class="field-label">{t('bills.exp_amount')} ({currencySymbol(currency)})</label>
                     <input type="number" min="0.01" step="0.01" id="exp-amount" placeholder={`${t('bills.exp_amount')} (${currencySymbol(currency)})`}
                       value={draft.amountStr}
-                      onInput={e => setDraft(d => ({ ...d, amountStr: (e.target as HTMLInputElement).value }))} />
+                      onKeyDown={e => { if (e.key === 'Enter') addExpense() }}
+                      onInput={e => {
+                        setDraft(d => ({ ...d, amountStr: (e.target as HTMLInputElement).value }))
+                        if (draftErrors.amount) setDraftErrors(d => ({ ...d, amount: undefined }))
+                      }} />
+                    {draftErrors.amount && <span class="field-error">{draftErrors.amount}</span>}
                   </div>
                   <div class="form-field">
                     <label for="paid-by" class="field-label">{t('bills.exp_paid_by')}</label>
@@ -209,16 +225,20 @@ export default function BillSplitter() {
                     {state.people.map(p => (
                       <label key={p} class="checkbox-item">
                         <input type="checkbox" value={p} checked={draft.participants.has(p)}
-                          onChange={e => setDraft(d => {
-                            const participants = new Set(d.participants)
-                            if ((e.target as HTMLInputElement).checked) participants.add(p)
-                            else participants.delete(p)
-                            return { ...d, participants }
-                          })} />
+                          onChange={e => {
+                            setDraft(d => {
+                              const participants = new Set(d.participants)
+                              if ((e.target as HTMLInputElement).checked) participants.add(p)
+                              else participants.delete(p)
+                              return { ...d, participants }
+                            })
+                            if (draftErrors.participants) setDraftErrors(d => ({ ...d, participants: undefined }))
+                          }} />
                         <span class="checkbox-name">{p}</span>
                       </label>
                     ))}
                   </div>
+                  {draftErrors.participants && <span class="field-error">{draftErrors.participants}</span>}
                 </div>
                 <button class="full-width" onClick={addExpense}>{t('bills.add_expense')}</button>
               </div>

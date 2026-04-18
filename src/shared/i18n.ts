@@ -75,6 +75,9 @@ const en = {
     currency: 'Currency',
     summary_paid: 'Paid',
     summary_pending: 'Pending',
+    err_description: 'Description is required',
+    err_amount: 'Enter a valid amount',
+    err_participants: 'Select at least one participant',
   },
   modal: {
     close: 'Close',
@@ -169,6 +172,9 @@ const es: typeof en = {
     currency: 'Moneda',
     summary_paid: 'Pagado',
     summary_pending: 'Pendiente',
+    err_description: 'La descripción es requerida',
+    err_amount: 'Ingresa un monto válido',
+    err_participants: 'Selecciona al menos un participante',
   },
   modal: {
     close: 'Cerrar',
