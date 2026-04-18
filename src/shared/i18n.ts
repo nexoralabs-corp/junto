@@ -66,6 +66,7 @@ const en = {
     no_expenses: 'No expenses yet.',
     need_people: 'Add at least 2 people to start.',
     total: 'Total',
+    participants_label: 'Who was involved:',
   },
   modal: {
     close: 'Close',
@@ -148,6 +149,7 @@ const es: typeof en = {
     no_expenses: 'Sin gastos aún.',
     need_people: 'Agrega al menos 2 personas para comenzar.',
     total: 'Total',
+    participants_label: 'Quiénes participaron:',
   },
   modal: {
     close: 'Cerrar',

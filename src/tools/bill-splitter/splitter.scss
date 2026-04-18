@@ -1,45 +1,55 @@
+// ─── Bill Splitter Styles ────────────────────────────────────────────────────
+
 .expense-list {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  margin-bottom: 10px;
+  gap: 10px;
+  margin-bottom: 12px;
 }
 
 .expense-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
+  gap: 12px;
+  padding: 12px 14px;
   background: var(--surface);
   border: 1.5px solid var(--border);
   border-radius: var(--r-md);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-  transition: border-color 150ms ease, box-shadow 150ms ease;
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 150ms ease;
 
   &:hover {
     border-color: var(--border-2);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.07);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transform: translateY(-1px);
   }
 
-  .expense-info { flex: 1; min-width: 0; }
+  &:active {
+    transform: translateY(0);
+  }
+
+  .expense-info { flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; }
 
   .exp-name {
-    font-size: 0.875rem;
+    font-size: 0.9375rem;
     font-weight: 600;
     color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .exp-meta {
-    font-size: 0.72rem;
+    font-size: 0.75rem;
     color: var(--text-3);
-    margin-top: 1px;
+    margin-top: 2px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
   .exp-amount {
-    font-size: 0.9375rem;
+    font-size: 1rem;
     font-weight: 700;
     color: var(--text);
     white-space: nowrap;
@@ -48,10 +58,10 @@
   .remove-btn {
     background: none;
     border: none;
-    padding: 3px 6px;
+    padding: 6px 10px;
     color: var(--text-3);
     border-radius: var(--r-sm);
-    font-size: 0.875rem;
+    font-size: 1rem;
     cursor: pointer;
     transition: all 150ms ease;
     line-height: 1;
@@ -63,23 +73,124 @@
       box-shadow: none;
     }
 
-    &:active { transform: none; }
+    &:active { transform: scale(0.95); }
   }
 }
 
 .expense-form {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 14px;
+  gap: 12px;
+  padding: 16px;
   background: var(--elevated);
   border: 1.5px solid var(--border);
   border-radius: var(--r-lg);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    input[type='text'] {
+      font-size: 1rem;
+    }
+  }
 
   .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 8px;
+    gap: 10px;
+  }
+
+  .form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .field-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text-3);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    input, select {
+      font-size: 0.9375rem;
+    }
+  }
+
+  .checkbox-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-2);
+    margin-bottom: 4px;
+  }
+
+  .checkbox-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+  }
+
+  .checkbox-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-2);
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: var(--r-sm);
+    transition: all 150ms ease;
+    user-select: none;
+
+    &:hover {
+      background: var(--surface);
+      color: var(--text);
+    }
+
+    input[type='checkbox'] {
+      appearance: none;
+      width: 17px;
+      height: 17px;
+      border: 1.5px solid var(--border-2);
+      border-radius: 4px;
+      background: var(--surface);
+      cursor: pointer;
+      position: relative;
+      flex-shrink: 0;
+      transition: all 150ms ease;
+      vertical-align: middle;
+
+      &:checked {
+        background: var(--accent);
+        border-color: var(--accent);
+
+        &::after {
+          content: '';
+          position: absolute;
+          left: 4px;
+          top: 1px;
+          width: 6px;
+          height: 10px;
+          border: 2px solid #fff;
+          border-top: none;
+          border-left: none;
+          transform: rotate(45deg);
+        }
+      }
+
+      &:focus-visible {
+        box-shadow: 0 0 0 3px var(--accent-dim);
+      }
+    }
+
+    .checkbox-name {
+      line-height: 1.4;
+    }
   }
 }
 
@@ -111,8 +222,8 @@
 .settlement-list {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  margin-bottom: 1.125rem;
+  gap: 8px;
+  margin-bottom: 1.25rem;
 }
 
 .txn-item {
@@ -124,24 +235,39 @@
   border: 1.5px solid var(--border);
   border-radius: var(--r-md);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+
+  &:hover {
+    border-color: var(--border-2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
 
   .txn-names {
-    font-size: 0.875rem;
+    font-size: 0.9375rem;
     color: var(--text);
     display: flex;
     align-items: center;
     gap: 6px;
+    min-width: 0;
+
+    strong {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
   }
 
   .txn-arrow {
     color: var(--text-3);
     font-size: 0.75rem;
+    flex-shrink: 0;
   }
 
   .txn-amount {
-    font-size: 0.9375rem;
+    font-size: 1rem;
     font-weight: 700;
     color: var(--success);
+    white-space: nowrap;
   }
 }
 
@@ -154,10 +280,55 @@
 }
 
 .total-line {
-  font-size: 0.8rem;
+  font-size: 0.875rem;
   color: var(--text-3);
   text-align: right;
   margin-bottom: 1rem;
 
   strong { color: var(--text-2); }
+}
+
+// ─── Responsive Styles ────────────────────────────────────────────────────────
+
+@media (max-width: 480px) {
+  .expense-item {
+    padding: 10px 12px;
+    gap: 10px;
+
+    .exp-name { font-size: 0.9rem; }
+    .exp-meta { font-size: 0.7rem; }
+    .exp-amount { font-size: 0.9375rem; }
+  }
+
+  .expense-form {
+    padding: 14px;
+
+    .form-row {
+      grid-template-columns: 1fr;
+    }
+
+    .form-field {
+      .field-label { display: none; } // Hide labels on mobile for cleaner look
+    }
+
+    .checkbox-item {
+      padding: 3px 6px;
+      font-size: 0.75rem;
+    }
+  }
+
+  .settlement-list { gap: 6px; }
+  .txn-item { padding: 10px 12px; }
+  .txn-names { font-size: 0.875rem; }
+  .txn-amount { font-size: 0.9375rem; }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .expense-form {
+    padding: 14px;
+
+    .form-row {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
 }

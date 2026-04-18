@@ -22,6 +22,7 @@ function App() {
 }
 
 function Home() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [, setLang] = useState(0)
 
   function openModal(tool: 'scheduler' | 'bills') {
@@ -39,6 +40,31 @@ function Home() {
     })
   }
 
+  // Close menu on click outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const navMenu = document.querySelector('.nav-menu')
+      if (isMenuOpen && !navMenu?.contains(e.target as Node)) {
+        setIsMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [isMenuOpen])
+
+  const navLinks = [
+    { href: '#scheduler', label: t('nav.scheduler') },
+    { href: '#bills', label: t('nav.bills') }
+  ]
+
+  function toggleMenu() {
+    setIsMenuOpen(prev => !prev)
+  }
+
+  function closeMenu() {
+    setIsMenuOpen(false)
+  }
+
   return (
     <div class="page">
       <nav class="navbar">
@@ -47,7 +73,61 @@ function Home() {
             <Logo />
             <span>Junto</span>
           </a>
-          <button class="secondary sm" onClick={() => { toggleLang(); setLang(n => n + 1) }}>{t('nav.lang')}</button>
+
+          {/* Mobile hamburger menu */}
+          <button
+            class="nav-toggle"
+            onClick={toggleMenu}
+            aria-expanded={isMenuOpen}
+            aria-label="Toggle navigation menu"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              {isMenuOpen ? (
+                <>
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </>
+              ) : (
+                <>
+                  <line x1="3" y1="12" x2="21" y2="12"></line>
+                  <line x1="3" y1="6" x2="21" y2="6"></line>
+                  <line x1="3" y1="18" x2="21" y2="18"></line>
+                </>
+              )}
+            </svg>
+          </button>
+
+          {/* Desktop nav links */}
+          <div class="nav-links">
+            {navLinks.map(link => (
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={closeMenu}
+                style={{ display: 'none' }} // Hidden on mobile, shown via CSS media query
+              >
+                {link.label}
+              </a>
+            ))}
+          </div>
+
+          <button
+            class="secondary sm nav-lang"
+            onClick={() => { toggleLang(); setLang(n => n + 1) }}
+            style={{ display: 'none' }} // Hidden on mobile, shown via CSS media query
+          >
+            {t('nav.lang')}
+          </button>
+
+          {/* Mobile menu */}
+          <div class={`nav-menu${isMenuOpen ? ' open' : ''}`}>
+            <button
+              class="secondary sm"
+              onClick={() => { toggleLang(); setLang(n => n + 1) }}
+            >
+              {t('nav.lang')}
+            </button>
+          </div>
         </div>
       </nav>
       <main class="content">

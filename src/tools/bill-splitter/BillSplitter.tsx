@@ -5,6 +5,7 @@ import { save, load, clear } from '../../shared/storage'
 import { copyToClipboard } from '../../shared/utils'
 import { SplitterState, Expense, settle, totalCents, fmtMoney, parseCents, nanoid } from './splitter'
 import { ExpenseItem, TxnItem } from './components'
+import { ToolNav } from '../../shared/components/nav'
 import './splitter.scss'
 
 const STORAGE_KEY = 'bills'
@@ -22,7 +23,6 @@ export default function BillSplitter() {
   const [draft, setDraft] = useState(() => makeDraft(initState().people))
   const [draftPerson, setDraftPerson] = useState('')
   const [copiedMsg, setCopiedMsg] = useState(false)
-  const [, forceUpdate] = useState(0)
 
   function persist(next: SplitterState) {
     setState(next)
@@ -83,25 +83,24 @@ export default function BillSplitter() {
     setCopiedMsg(true)
     setTimeout(() => setCopiedMsg(false), 2500)
   }
-
-  const txns = state.expenses.length > 0 ? settle(state) : []
   const total = totalCents(state.expenses)
   const hasPeople = state.people.length >= 2
+  const txns = state.expenses.length > 0 ? settle(state) : []
 
   return (
     <div class="page">
-      <nav class="tool-nav">
-        <a href="#" class="back-link">{t('common.back')}</a>
-        <span class="tool-title">{t('bills.title')}</span>
+      <ToolNav 
+        onBack={reset}
+        title={t('bills.title')}
+        subtitle={t('bills.subtitle')}
+      >
         <div class="nav-actions">
           {(state.people.length > 0 || state.expenses.length > 0) && (
-            <button class="secondary sm ghost" onClick={reset}>{t('common.reset')}</button>
+            <button class="secondary sm ghost">{t('common.reset')}</button>
           )}
-          <button class="secondary sm" onClick={() => { toggleLang(); forceUpdate(n => n + 1) }}>{t('nav.lang')}</button>
+          <button class="secondary sm" onClick={() => toggleLang()}>{t('nav.lang')}</button>
         </div>
-      </nav>
-
-      <p class="tool-subtitle">{t('bills.subtitle')}</p>
+      </ToolNav>
 
       {/* People */}
       <section class="section">
@@ -146,33 +145,44 @@ export default function BillSplitter() {
           ? <p class="hint-text">{t('bills.need_people')}</p>
           : (
             <div class="expense-form">
-              <input type="text" placeholder={t('bills.exp_description_placeholder')}
-                value={draft.description} autocomplete="off"
-                onInput={e => setDraft(d => ({ ...d, description: (e.target as HTMLInputElement).value }))} />
+              <div class="form-group">
+                <input type="text" placeholder={t('bills.exp_description_placeholder')}
+                  value={draft.description} autocomplete="off"
+                  onInput={e => setDraft(d => ({ ...d, description: (e.target as HTMLInputElement).value }))} />
+              </div>
               <div class="form-row">
-                <input type="number" min="0.01" step="0.01" placeholder={t('bills.exp_amount')}
-                  value={draft.amountStr}
-                  onInput={e => setDraft(d => ({ ...d, amountStr: (e.target as HTMLInputElement).value }))} />
-                <select value={draft.paidBy}
-                  onChange={e => setDraft(d => ({ ...d, paidBy: (e.target as HTMLSelectElement).value }))}>
-                  {state.people.map(p => <option key={p} value={p}>{p}</option>)}
-                </select>
+                <div class="form-field">
+                  <label for="exp-amount" class="field-label">{t('bills.exp_amount')}</label>
+                  <input type="number" min="0.01" step="0.01" id="exp-amount" placeholder={t('bills.exp_amount')}
+                    value={draft.amountStr}
+                    onInput={e => setDraft(d => ({ ...d, amountStr: (e.target as HTMLInputElement).value }))} />
+                </div>
+                <div class="form-field">
+                  <label for="paid-by" class="field-label">{t('bills.paid_by')}</label>
+                  <select id="paid-by" value={draft.paidBy}
+                    onChange={e => setDraft(d => ({ ...d, paidBy: (e.target as HTMLSelectElement).value }))}>
+                    {state.people.map(p => <option key={p} value={p}>{p}</option>)}
+                  </select>
+                </div>
               </div>
-              <div class="checkboxes">
-                {state.people.map(p => (
-                  <label key={p}>
-                    <input type="checkbox" value={p} checked={draft.participants.has(p)}
-                      onChange={e => setDraft(d => {
-                        const participants = new Set(d.participants)
-                        if ((e.target as HTMLInputElement).checked) participants.add(p)
-                        else participants.delete(p)
-                        return { ...d, participants }
-                      })} />
-                    {p}
-                  </label>
-                ))}
+              <div class="form-group">
+                <label class="checkbox-label">{t('bills.participants_label')}</label>
+                <div class="checkbox-list">
+                  {state.people.map(p => (
+                    <label key={p} class="checkbox-item">
+                      <input type="checkbox" value={p} checked={draft.participants.has(p)}
+                        onChange={e => setDraft(d => {
+                          const participants = new Set(d.participants)
+                          if ((e.target as HTMLInputElement).checked) participants.add(p)
+                          else participants.delete(p)
+                          return { ...d, participants }
+                        })} />
+                      <span class="checkbox-name">{p}</span>
+                    </label>
+                  ))}
+                </div>
               </div>
-              <button class="secondary full-width" onClick={addExpense}>{t('bills.add_expense')}</button>
+              <button class="full-width" onClick={addExpense}>{t('bills.add_expense')}</button>
             </div>
           )
         }
