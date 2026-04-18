@@ -24,9 +24,28 @@ export const PARTICIPANT_COLORS = [
   '#0E7490', // cyan-700
 ] as const
 
+// Distinct palette for "All" overlap labels - bright, saturated colors unique from participant colors
+export const ALL_LABEL_COLORS = [
+  '#A855F7', // bright purple
+  '#EC4899', // hot pink
+  '#3B82F6', // electric blue
+  '#F97316', // orange glow
+  '#84CC16', // lime green
+  '#06B6D4', // cyan spark
+  '#E11D48', // rose red
+  '#6366F1', // indigo burst
+] as const
+
 export function participantColor(idx: number): string {
   return PARTICIPANT_COLORS[idx % PARTICIPANT_COLORS.length]
 }
+
+export function allLabelColor(idx: number): string {
+  return ALL_LABEL_COLORS[idx % ALL_LABEL_COLORS.length]
+}
+
+// Exclusive color for All-tab full-match cells — not in any other palette
+export const ALL_MATCH_COLOR = '#4F46E5' // indigo-600
 
 export function colorRgba(hex: string, alpha: number): string {
   const r = parseInt(hex.slice(1, 3), 16)

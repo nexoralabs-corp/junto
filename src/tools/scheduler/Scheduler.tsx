@@ -6,7 +6,7 @@ import { copyToClipboard } from '../../shared/utils'
 import {
   Participant, SchedulerState, HOURS, NUM_DAYS,
   makeSlot, formatHour, slotCounts, getExistingOverlap, groupSlots,
-  participantColor, colorRgba,
+  participantColor, colorRgba, allLabelColor, ALL_MATCH_COLOR,
 } from './scheduler'
 import { vars } from '../../shared/utils'
 import { LinkImportForm } from './components'
@@ -168,7 +168,7 @@ function Grid({ participants, activeTab, onMouseDown, onMouseEnter }: GridProps)
               let cls = 'sched-cell slot'
               let style: preact.JSX.CSSProperties | undefined
               if (total > 0 && holders.length === total && holders.length > 0) {
-                cls += ' overlap'
+                cls += ' all-match'
               } else if (holders.length === 1) {
                 const ci = participants.indexOf(holders[0])
                 const c = participantColor(ci)
@@ -177,7 +177,10 @@ function Grid({ participants, activeTab, onMouseDown, onMouseEnter }: GridProps)
               } else if (holders.length > 1) {
                 const ratio = (holders.length / total).toFixed(2)
                 cls += ' partial'
-                style = vars({ '--overlap-ratio': ratio })
+                // Use distinct "All" palette colors for partial overlap - each person gets a unique color
+                const ci = participants.indexOf(holders[0])
+                const c = allLabelColor(ci)
+                style = vars({ '--overlap-ratio': ratio, '--partial-bg': c, '--partial-border': c })
               }
               return <div class={cls} key={slot} data-slot={slot} style={style} />
             })}
@@ -241,9 +244,9 @@ function ResultsPanel({ participants, activeTab }: { participants: Participant[]
         <div class="results-section">
           {fullOverlap.size > 0
             ? <>
-                <div class="results-label success-label">{t('scheduler.all_free')}</div>
+                <div class="results-label all-match-label">{t('scheduler.all_free')}</div>
                 <div class="results-chips">
-                  {ranges.map(r => <span class="result-chip overlap-chip" key={r}>{r}</span>)}
+                  {ranges.map(r => <span class="result-chip all-match-chip" key={r}>{r}</span>)}
                 </div>
               </>
             : <p class="results-empty">{t('scheduler.no_overlap')}</p>
@@ -309,7 +312,7 @@ function Legend({ participants, activeTab }: { participants: Participant[], acti
         ))}
         {participants.length >= 2 && (
           <div class="legend-item">
-            <div class="dot overlap" />
+            <div class="dot" style={{ background: ALL_MATCH_COLOR }} />
             {t('scheduler.all_free')}
           </div>
         )}

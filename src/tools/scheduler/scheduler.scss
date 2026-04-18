@@ -330,8 +330,16 @@
     }
 
     &.partial {
-      background: rgba(13, 148, 136, calc(var(--overlap-ratio, 0) * 0.45));
-      border-color: rgba(13, 148, 136, calc(var(--overlap-ratio, 0) * 0.40));
+      background: var(--partial-bg);
+      border-color: var(--partial-border);
+      opacity: calc(var(--overlap-ratio, 0) * 0.7);
+      cursor: default;
+    }
+
+    &.all-match {
+      background: #4F46E5;
+      border-color: #4338CA;
+      box-shadow: 0 0 0 1px rgba(79,70,229,0.35), 0 2px 8px rgba(79,70,229,0.25);
       cursor: default;
     }
 
@@ -391,6 +399,7 @@
     &.others         { background: var(--warning); opacity: 0.55; }
     &.overlap        { background: var(--success); }
     &.partial-legend { background: rgba(13, 148, 136, 0.35); }
+    &.all-label      { background: #4F46E5; }
   }
 }
 
@@ -417,6 +426,7 @@
   margin-bottom: 0.5rem;
 
   &.success-label { color: var(--success); }
+  &.all-match-label { color: #4338CA; }
 }
 
 .results-chips {
@@ -437,6 +447,12 @@
     background: rgba(19, 78, 74, 0.08);
     color: var(--success);
     border: 1px solid rgba(19, 78, 74, 0.22);
+  }
+
+  &.all-match-chip {
+    background: rgba(79, 70, 229, 0.10);
+    color: #4F46E5;
+    border: 1px solid rgba(79, 70, 229, 0.28);
   }
 
   &.others-chip {
