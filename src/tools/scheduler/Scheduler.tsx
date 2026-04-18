@@ -139,8 +139,8 @@ function ScheduleSidebar({ schedules, activeId, onSelect, onAdd, onRemove, onRen
 interface GridProps {
   participants: Participant[]
   activeTab: 'all' | number
-  onMouseDown: (slot: string) => void
-  onMouseEnter: (slot: string) => void
+  onMouseDown?: (slot: string) => void
+  onMouseEnter?: (slot: string) => void
 }
 
 function Grid({ participants, activeTab, onMouseDown, onMouseEnter }: GridProps) {
@@ -157,7 +157,7 @@ function Grid({ participants, activeTab, onMouseDown, onMouseEnter }: GridProps)
     const total = participants.length
     const pSets = participants.map(p => new Set(p.slots))
     return (
-      <div class="sched-grid" id="sched-grid" draggable={false}>
+      <div class="sched-grid read-only" id="sched-grid" draggable={false}>
         {dayHeaders}
         {HOURS.map(h => (
           <>
@@ -216,8 +216,8 @@ function Grid({ participants, activeTab, onMouseDown, onMouseEnter }: GridProps)
             else if (hasOthers) cls += ' others'
             return (
               <div class={cls} key={slot} data-slot={slot}
-                onMouseDown={() => onMouseDown(slot)}
-                onMouseEnter={() => onMouseEnter(slot)}
+                onMouseDown={() => onMouseDown?.(slot)}
+                onMouseEnter={() => onMouseEnter?.(slot)}
               />
             )
           })}
