@@ -14,7 +14,7 @@ export function ExpenseItem({ description, paidBy, participants, amountCents, cu
     <div class="expense-item">
       <div class="expense-info">
         <div class="exp-name">{description}</div>
-        <div class="exp-meta">{t('bills.exp_paid_by')}: {paidBy} · {participants.join(', ')}</div>
+        <div class="exp-meta"><span><strong>{t('bills.exp_paid_by')}:</strong> {paidBy}</span> · <span><strong>{t('bills.exp_participants')}:</strong> {participants.join(', ')}</span></div>
       </div>
       <span class="exp-amount">{fmtMoney(amountCents, currency)}</span>
       {onRemove && (

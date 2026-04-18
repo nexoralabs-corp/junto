@@ -59,7 +59,7 @@ export default function BillSplitter() {
     const expenses = state.expenses
       .map(exp => ({ ...exp, participants: exp.participants.filter(p => p !== name) }))
       .filter(exp => exp.participants.length > 0)
-    persist({ people, expenses })
+    persist({ ...state, people, expenses })
     setDraft(d => {
       const participants = new Set(d.participants)
       participants.delete(name)
