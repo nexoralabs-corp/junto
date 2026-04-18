@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#F7FAFB;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#EAF2F5;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#2E8B8B;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3AAFAF;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)" />
+
+  <!-- Decorative circles -->
+  <circle cx="1100" cy="80" r="180" fill="#2E8B8B" opacity="0.06" />
+  <circle cx="100" cy="560" r="220" fill="#2E8B8B" opacity="0.05" />
+  <circle cx="1050" cy="580" r="120" fill="#3AAFAF" opacity="0.07" />
+
+  <!-- Accent bar -->
+  <rect x="80" y="195" width="6" height="80" rx="3" fill="url(#accent)" />
+
+  <!-- Logo / App name -->
+  <text x="104" y="248" font-family="'Segoe UI', system-ui, -apple-system, sans-serif" font-size="80" font-weight="700" fill="#1A2E2E" letter-spacing="-2">junto</text>
+
+  <!-- Tagline -->
+  <text x="104" y="310" font-family="'Segoe UI', system-ui, -apple-system, sans-serif" font-size="32" font-weight="400" fill="#4A7070" letter-spacing="0.2">Tools for friends. No login. No data. Just works.</text>
+
+  <!-- Tool pills -->
+  <!-- Pill 1 -->
+  <rect x="104" y="370" width="220" height="54" rx="27" fill="#2E8B8B" opacity="0.12" />
+  <text x="214" y="403" font-family="'Segoe UI', system-ui, -apple-system, sans-serif" font-size="22" font-weight="600" fill="#2E8B8B" text-anchor="middle">📅 Sync Times</text>
+
+  <!-- Pill 2 -->
+  <rect x="342" y="370" width="220" height="54" rx="27" fill="#2E8B8B" opacity="0.12" />
+  <text x="452" y="403" font-family="'Segoe UI', system-ui, -apple-system, sans-serif" font-size="22" font-weight="600" fill="#2E8B8B" text-anchor="middle">💸 Bill Splitter</text>
+
+  <!-- Domain -->
+  <text x="104" y="568" font-family="'Segoe UI', system-ui, -apple-system, sans-serif" font-size="26" font-weight="500" fill="#7A9999" letter-spacing="0.5">junto.nexoralabs.com</text>
+
+  <!-- Decorative grid dots (right side) -->
+  <g opacity="0.15" fill="#2E8B8B">
+    <circle cx="780" cy="200" r="4"/><circle cx="820" cy="200" r="4"/><circle cx="860" cy="200" r="4"/><circle cx="900" cy="200" r="4"/><circle cx="940" cy="200" r="4"/>
+    <circle cx="780" cy="240" r="4"/><circle cx="820" cy="240" r="4"/><circle cx="860" cy="240" r="4"/><circle cx="900" cy="240" r="4"/><circle cx="940" cy="240" r="4"/>
+    <circle cx="780" cy="280" r="4"/><circle cx="820" cy="280" r="4"/><circle cx="860" cy="280" r="4"/><circle cx="900" cy="280" r="4"/><circle cx="940" cy="280" r="4"/>
+    <circle cx="780" cy="320" r="4"/><circle cx="820" cy="320" r="4"/><circle cx="860" cy="320" r="4"/><circle cx="900" cy="320" r="4"/><circle cx="940" cy="320" r="4"/>
+    <circle cx="780" cy="360" r="4"/><circle cx="820" cy="360" r="4"/><circle cx="860" cy="360" r="4"/><circle cx="900" cy="360" r="4"/><circle cx="940" cy="360" r="4"/>
+    <circle cx="780" cy="400" r="4"/><circle cx="820" cy="400" r="4"/><circle cx="860" cy="400" r="4"/><circle cx="900" cy="400" r="4"/><circle cx="940" cy="400" r="4"/>
+  </g>
+</svg>

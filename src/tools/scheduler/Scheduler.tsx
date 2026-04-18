@@ -25,7 +25,8 @@ type StoredSchedules = { schedules: ScheduleEntry[] }
 const STORAGE_KEY = 'scheduler'
 
 function uid(): string {
-  return crypto.randomUUID()
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID()
+  return Date.now().toString(36) + Math.random().toString(36).slice(2)
 }
 
 function defaultEntry(): ScheduleEntry {
