@@ -916,6 +916,22 @@ label {
   }
 }
 
+.modal-confirm {
+  max-width: 360px;
+
+  h2 { margin-bottom: 8px; font-size: 1.1rem; }
+
+  .modal-desc { margin-bottom: 20px; }
+}
+
+.modal-confirm-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+
+  button { margin: 0; padding: 8px 18px; font-size: 0.9rem; }
+}
+
 // ─── Responsive ──────────────────────────────────────────────────────────────
 
 @media (min-width: 1024px) {

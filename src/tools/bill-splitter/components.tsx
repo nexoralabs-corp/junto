@@ -1,4 +1,5 @@
 import { t } from '../../shared/i18n'
+import { ConfirmModal } from '../../shared/components/modal'
 import { fmtMoney, Currency } from './splitter'
 
 export function ExpenseItem({ description, paidBy, participants, amountCents, currency, onRemove }: {
@@ -16,7 +17,14 @@ export function ExpenseItem({ description, paidBy, participants, amountCents, cu
         <div class="exp-meta">{t('bills.exp_paid_by')}: {paidBy} · {participants.join(', ')}</div>
       </div>
       <span class="exp-amount">{fmtMoney(amountCents, currency)}</span>
-      {onRemove && <button class="remove-btn" onClick={onRemove}>{t('common.remove')}</button>}
+      {onRemove && (
+        <button class="remove-btn" onClick={() => ConfirmModal({
+          title: t('modal.confirm_remove_title'),
+          message: t('modal.confirm_remove_msg'),
+          confirmLabel: t('modal.confirm_remove_btn'),
+          onConfirm: onRemove,
+        })}>{t('common.remove')}</button>
+      )}
     </div>
   )
 }
