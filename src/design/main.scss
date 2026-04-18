@@ -453,6 +453,52 @@ label {
   }
 }
 
+// ─── Accordion ────────────────────────────────────────────────────────────────
+
+.accordion {
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-md);
+  overflow: hidden;
+  margin-bottom: 12px;
+
+  &--open { border-color: var(--accent-border); }
+}
+
+.accordion-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text);
+  text-align: left;
+  box-shadow: none;
+
+  &:hover { background: var(--elevated); box-shadow: none; }
+  &:active { transform: none; }
+}
+
+.accordion-chevron {
+  flex-shrink: 0;
+  color: var(--text-3);
+  transition: transform 200ms ease;
+
+  .accordion--open & { transform: rotate(180deg); }
+}
+
+.accordion-body {
+  padding: 12px 14px;
+  border-top: 1.5px solid var(--border);
+  background: var(--surface);
+
+  .accordion--open & { border-color: var(--accent-border); }
+}
+
 // ─── Add row ──────────────────────────────────────────────────────────────────
 
 .add-row {

@@ -1,3 +1,24 @@
+import { useState } from 'preact/hooks'
+
+export function Accordion({ title, children, defaultOpen = false }: {
+  title: string
+  children: preact.ComponentChildren
+  defaultOpen?: boolean
+}) {
+  const [open, setOpen] = useState(defaultOpen)
+  return (
+    <div class={`accordion${open ? ' accordion--open' : ''}`}>
+      <button class="accordion-trigger" onClick={() => setOpen(o => !o)} aria-expanded={open}>
+        <span>{title}</span>
+        <svg class="accordion-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="4 6 8 10 12 6" />
+        </svg>
+      </button>
+      {open && <div class="accordion-body">{children}</div>}
+    </div>
+  )
+}
+
 export function Logo() {
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
