@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'preact/hooks'
+import { useState } from 'preact/hooks'
 import { t, toggleLang } from '../../shared/i18n'
 import { decodeState, buildShareUrl } from '../../shared/url-state'
 import { save, load, clear } from '../../shared/storage'
 import { copyToClipboard } from '../../shared/utils'
-import { SplitterState, Expense, Currency, settle, totalCents, fmtMoney, parseCents, nanoid, txnKey } from './splitter'
+import { SplitterState, Expense, Currency, settle, totalCents, fmtMoney, parseCents, nanoid, txnKey, currencySymbol } from './splitter'
 import { ExpenseItem, TxnItem } from './components'
 import { ToolNav } from '../../shared/components/nav'
 import { SecondaryButton } from '../../shared/components/buttons'
@@ -87,10 +87,6 @@ export default function BillSplitter() {
     persist({ ...state, paidTxns: next })
   }
 
-  function consolidate() {
-    persist({ ...state, paidTxns: txns.map(txnKey) })
-  }
-
   function setCurrency(currency: Currency) {
     persist({ ...state, currency })
   }
@@ -107,9 +103,12 @@ export default function BillSplitter() {
   const hasPeople = state.people.length >= 2
   const txns = state.expenses.length > 0 ? settle(state) : []
   const paidTxns = state.paidTxns ?? []
-  const allPaid = txns.length > 0 && txns.every(tx => paidTxns.includes(txnKey(tx)))
+  const unpaidTxns = txns.filter(tx => !paidTxns.includes(txnKey(tx)))
+  const paidAmountCents = txns.filter(tx => paidTxns.includes(txnKey(tx))).reduce((s, tx) => s + tx.amountCents, 0)
+  const pendingAmountCents = unpaidTxns.reduce((s, tx) => s + tx.amountCents, 0)
+  const allPaid = txns.length > 0 && unpaidTxns.length === 0
 
-  useEffect(() => { if (allPaid) setSettlementOpen(false) }, [allPaid])
+
 
   return (
     <div class="page">
@@ -180,13 +179,13 @@ export default function BillSplitter() {
                 </div>
                 <div class="form-row">
                   <div class="form-field">
-                    <label for="exp-amount" class="field-label">{t('bills.exp_amount')}</label>
-                    <input type="number" min="0.01" step="0.01" id="exp-amount" placeholder={t('bills.exp_amount')}
+                    <label for="exp-amount" class="field-label">{t('bills.exp_amount')} ({currencySymbol(currency)})</label>
+                    <input type="number" min="0.01" step="0.01" id="exp-amount" placeholder={`${t('bills.exp_amount')} (${currencySymbol(currency)})`}
                       value={draft.amountStr}
                       onInput={e => setDraft(d => ({ ...d, amountStr: (e.target as HTMLInputElement).value }))} />
                   </div>
                   <div class="form-field">
-                    <label for="paid-by" class="field-label">{t('bills.paid_by')}</label>
+                    <label for="paid-by" class="field-label">{t('bills.exp_paid_by')}</label>
                     <select id="paid-by" value={draft.paidBy}
                       onChange={e => setDraft(d => ({ ...d, paidBy: (e.target as HTMLSelectElement).value }))}>
                       {state.people.map(p => <option key={p} value={p}>{p}</option>)}
@@ -252,30 +251,33 @@ export default function BillSplitter() {
           {txns.length === 0
             ? <p class="all-settled">{t('bills.all_settled')}</p>
             : (
-              <>
-                {allPaid && <p class="all-settled">{t('bills.all_settled')}</p>}
-                <Accordion title={t('bills.settlement')} open={settlementOpen} onToggle={setSettlementOpen}>
-                  <div class="settlement-list">
-                    {txns.map((tx, i) => {
-                      const key = txnKey(tx)
-                      return (
-                        <TxnItem
-                          key={i}
-                          from={tx.from}
-                          to={tx.to}
-                          amountCents={tx.amountCents}
-                          currency={currency}
-                          paid={paidTxns.includes(key)}
-                          onTogglePaid={() => togglePaid(key)}
-                        />
-                      )
-                    })}
-                  </div>
-                  {txns.length > 1 && (
-                    <button class="secondary full-width" onClick={consolidate}>{t('bills.consolidate')}</button>
-                  )}
-                </Accordion>
-              </>
+              <Accordion title={t('bills.settlement')} open={settlementOpen} onToggle={setSettlementOpen}>
+                <div class="settlement-list">
+                  {txns.map((tx, i) => {
+                    const key = txnKey(tx)
+                    return (
+                      <TxnItem
+                        key={i}
+                        from={tx.from}
+                        to={tx.to}
+                        amountCents={tx.amountCents}
+                        currency={currency}
+                        paid={paidTxns.includes(key)}
+                        onTogglePaid={() => togglePaid(key)}
+                      />
+                    )
+                  })}
+                </div>
+                {allPaid
+                  ? <p class="all-settled">{t('bills.all_settled')}</p>
+                  : paidAmountCents > 0 && (
+                    <p class="settlement-summary">
+                      <span class="summary-paid">{t('bills.summary_paid')}: <strong>{fmtMoney(paidAmountCents, currency)}</strong></span>
+                      <span class="summary-pending">{t('bills.summary_pending')}: <strong>{fmtMoney(pendingAmountCents, currency)}</strong></span>
+                    </p>
+                  )
+                }
+              </Accordion>
             )
           }
           <button class="full-width" onClick={share}>{t('bills.share')}</button>

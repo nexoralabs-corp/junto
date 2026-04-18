@@ -78,6 +78,12 @@ export function txnKey(tx: Transaction): string {
   return `${tx.from}>${tx.to}:${tx.amountCents}`
 }
 
+export function currencySymbol(currency: Currency): string {
+  if (currency === 'EUR') return '€'
+  if (currency === 'PEN') return 'S/'
+  return '$'
+}
+
 export function fmtMoney(cents: number, currency: Currency = 'USD'): string {
   const val = (cents / 100).toFixed(2)
   if (currency === 'EUR') return `€${val}`
