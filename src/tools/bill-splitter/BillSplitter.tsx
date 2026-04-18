@@ -1,4 +1,4 @@
-import { useState } from 'preact/hooks'
+import { useState, useEffect } from 'preact/hooks'
 import { t, toggleLang } from '../../shared/i18n'
 import { decodeState, buildShareUrl } from '../../shared/url-state'
 import { save, load, clear } from '../../shared/storage'
@@ -26,6 +26,7 @@ export default function BillSplitter() {
   const [draftPerson, setDraftPerson] = useState('')
   const [addingPerson, setAddingPerson] = useState(false)
   const [copiedMsg, setCopiedMsg] = useState(false)
+  const [settlementOpen, setSettlementOpen] = useState(true)
 
   function persist(next: SplitterState) {
     setState(next)
@@ -107,6 +108,8 @@ export default function BillSplitter() {
   const txns = state.expenses.length > 0 ? settle(state) : []
   const paidTxns = state.paidTxns ?? []
   const allPaid = txns.length > 0 && txns.every(tx => paidTxns.includes(txnKey(tx)))
+
+  useEffect(() => { if (allPaid) setSettlementOpen(false) }, [allPaid])
 
   return (
     <div class="page">
@@ -251,7 +254,7 @@ export default function BillSplitter() {
             : (
               <>
                 {allPaid && <p class="all-settled">{t('bills.all_settled')}</p>}
-                <Accordion title={t('bills.settlement')} defaultOpen open={!allPaid}>
+                <Accordion title={t('bills.settlement')} open={settlementOpen} onToggle={setSettlementOpen}>
                   <div class="settlement-list">
                     {txns.map((tx, i) => {
                       const key = txnKey(tx)

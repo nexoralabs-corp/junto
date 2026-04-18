@@ -1,16 +1,23 @@
 import { useState } from 'preact/hooks'
 
-export function Accordion({ title, children, defaultOpen = false, open: controlledOpen }: {
+export function Accordion({ title, children, defaultOpen = false, open: controlledOpen, onToggle }: {
   title: string
   children: preact.ComponentChildren
   defaultOpen?: boolean
   open?: boolean
+  onToggle?: (open: boolean) => void
 }) {
   const [open, setOpen] = useState(defaultOpen)
   const isOpen = controlledOpen !== undefined ? controlledOpen : open
+
+  function handleToggle() {
+    if (onToggle) onToggle(!isOpen)
+    else setOpen(o => !o)
+  }
+
   return (
     <div class={`accordion${isOpen ? ' accordion--open' : ''}`}>
-      <button class="accordion-trigger" onClick={() => setOpen(o => !o)} aria-expanded={isOpen}>
+      <button class="accordion-trigger" onClick={handleToggle} aria-expanded={isOpen}>
         <span>{title}</span>
         <svg class="accordion-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="4 6 8 10 12 6" />
