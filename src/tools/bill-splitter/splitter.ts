@@ -15,6 +15,17 @@ export type SplitterState = {
   currency?: Currency
 }
 
+export type Bill = {
+  id: string
+  name: string
+  state: SplitterState
+}
+
+export type MultiBillState = {
+  bills: Bill[]
+  activeId: string
+}
+
 export type Transaction = {
   from: string
   to: string

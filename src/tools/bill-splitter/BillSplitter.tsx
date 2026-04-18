@@ -1,38 +1,118 @@
 import { useState } from 'preact/hooks'
 import { t, toggleLang } from '../../shared/i18n'
 import { decodeState, buildShareUrl } from '../../shared/url-state'
-import { save, load, clear } from '../../shared/storage'
+import { save, load } from '../../shared/storage'
 import { copyToClipboard } from '../../shared/utils'
-import { SplitterState, Expense, Currency, settle, totalCents, fmtMoney, parseCents, nanoid, txnKey, currencySymbol } from './splitter'
+import { SplitterState, Expense, Currency, MultiBillState, Bill, settle, totalCents, fmtMoney, parseCents, nanoid, txnKey, currencySymbol } from './splitter'
 import { ExpenseItem, TxnItem } from './components'
 import { ToolNav } from '../../shared/components/nav'
 import { SecondaryButton } from '../../shared/components/buttons'
 import { Accordion } from '../../shared/components'
 import './splitter.scss'
 
-const STORAGE_KEY = 'bills'
-
-function initState(): SplitterState {
-  return decodeState<SplitterState>() ?? load<SplitterState>(STORAGE_KEY) ?? { people: [], expenses: [] }
-}
+const MULTI_KEY = 'multi_bills'
+const LEGACY_KEY = 'bills'
 
 function makeDraft(people: string[]) {
   return { description: '', amountStr: '', paidBy: people[0] ?? '', participants: new Set<string>(people) }
 }
 
+function makeBill(name: string): Bill {
+  return { id: nanoid(), name, state: { people: [], expenses: [] } }
+}
+
+function initMultiBillState(): MultiBillState {
+  const urlState = decodeState<SplitterState>()
+  if (urlState) {
+    const bill: Bill = { id: nanoid(), name: 'Shared', state: urlState }
+    return { bills: [bill], activeId: bill.id }
+  }
+  const saved = load<MultiBillState>(MULTI_KEY)
+  if (saved?.bills?.length) return saved
+  const legacy = load<SplitterState>(LEGACY_KEY)
+  if (legacy?.people) {
+    const bill: Bill = { id: nanoid(), name: 'Bill 1', state: legacy }
+    return { bills: [bill], activeId: bill.id }
+  }
+  const bill = makeBill('Bill 1')
+  return { bills: [bill], activeId: bill.id }
+}
+
 export default function BillSplitter() {
-  const [state, setState] = useState<SplitterState>(initState)
-  const [draft, setDraft] = useState(() => makeDraft(initState().people))
+  const [multi, setMulti] = useState<MultiBillState>(initMultiBillState)
+  const [draft, setDraft] = useState(() => {
+    const m = initMultiBillState()
+    const active = m.bills.find(b => b.id === m.activeId) ?? m.bills[0]
+    return makeDraft(active.state.people)
+  })
   const [draftPerson, setDraftPerson] = useState('')
   const [addingPerson, setAddingPerson] = useState(false)
   const [draftErrors, setDraftErrors] = useState<{ description?: string; amount?: string; participants?: string }>({})
   const [copiedMsg, setCopiedMsg] = useState(false)
   const [settlementOpen, setSettlementOpen] = useState(true)
+  const [editingTabId, setEditingTabId] = useState<string | null>(null)
+  const [tabRenameValue, setTabRenameValue] = useState('')
   const [, forceUpdate] = useState(0)
 
-  function persist(next: SplitterState) {
-    setState(next)
-    save(STORAGE_KEY, next)
+  const activeBill = multi.bills.find(b => b.id === multi.activeId) ?? multi.bills[0]
+  const state = activeBill.state
+
+  function persistMulti(next: MultiBillState) {
+    setMulti(next)
+    save(MULTI_KEY, next)
+  }
+
+  function persist(nextState: SplitterState) {
+    persistMulti({
+      ...multi,
+      bills: multi.bills.map(b => b.id === multi.activeId ? { ...b, state: nextState } : b),
+    })
+  }
+
+  function switchBill(id: string) {
+    const bill = multi.bills.find(b => b.id === id)
+    if (!bill || id === multi.activeId) return
+    persistMulti({ ...multi, activeId: id })
+    setDraft(makeDraft(bill.state.people))
+    setDraftPerson('')
+    setAddingPerson(false)
+    setDraftErrors({})
+    setEditingTabId(null)
+    window.history.replaceState(null, '', `${window.location.origin}${window.location.pathname}#bills`)
+  }
+
+  function addBill() {
+    const name = `Bill ${multi.bills.length + 1}`
+    const bill = makeBill(name)
+    persistMulti({ bills: [...multi.bills, bill], activeId: bill.id })
+    setDraft(makeDraft([]))
+    setDraftPerson('')
+    setAddingPerson(false)
+    setDraftErrors({})
+    window.history.replaceState(null, '', `${window.location.origin}${window.location.pathname}#bills`)
+  }
+
+  function deleteBill(id: string) {
+    if (multi.bills.length <= 1) return
+    const bills = multi.bills.filter(b => b.id !== id)
+    const activeId = id === multi.activeId ? bills[0].id : multi.activeId
+    persistMulti({ bills, activeId })
+    if (id === multi.activeId) {
+      const newActive = bills.find(b => b.id === activeId)!
+      setDraft(makeDraft(newActive.state.people))
+      setDraftPerson('')
+      setAddingPerson(false)
+      setDraftErrors({})
+    }
+  }
+
+  function finishRename() {
+    if (!editingTabId) return
+    const name = tabRenameValue.trim()
+    if (name) {
+      persistMulti({ ...multi, bills: multi.bills.map(b => b.id === editingTabId ? { ...b, name } : b) })
+    }
+    setEditingTabId(null)
   }
 
   function reset() {
@@ -40,7 +120,6 @@ export default function BillSplitter() {
     persist(empty)
     setDraft(makeDraft([]))
     setDraftPerson('')
-    clear(STORAGE_KEY)
     window.history.replaceState(null, '', `${window.location.origin}${window.location.pathname}#bills`)
   }
 
@@ -84,8 +163,7 @@ export default function BillSplitter() {
   }
 
   function removeExpense(id: string) {
-    const next = { ...state, expenses: state.expenses.filter(e => e.id !== id) }
-    persist(next)
+    persist({ ...state, expenses: state.expenses.filter(e => e.id !== id) })
   }
 
   function togglePaid(key: string) {
@@ -105,6 +183,7 @@ export default function BillSplitter() {
     setCopiedMsg(true)
     setTimeout(() => setCopiedMsg(false), 2500)
   }
+
   const currency = state.currency ?? 'USD'
   const total = totalCents(state.expenses)
   const hasPeople = state.people.length >= 2
@@ -114,8 +193,6 @@ export default function BillSplitter() {
   const paidAmountCents = txns.filter(tx => paidTxns.includes(txnKey(tx))).reduce((s, tx) => s + tx.amountCents, 0)
   const pendingAmountCents = unpaidTxns.reduce((s, tx) => s + tx.amountCents, 0)
   const allPaid = txns.length > 0 && unpaidTxns.length === 0
-
-
 
   return (
     <div class="page">
@@ -131,6 +208,44 @@ export default function BillSplitter() {
           <button class="secondary sm" onClick={() => { toggleLang(); forceUpdate(n => n + 1) }}>{t('nav.lang')}</button>
         </div>
       </ToolNav>
+
+      {/* Bill Tabs */}
+      <div class="bills-tabs">
+        {multi.bills.map(bill => (
+          <div
+            key={bill.id}
+            class={`bill-tab${bill.id === multi.activeId ? ' active' : ''}`}
+            onClick={() => switchBill(bill.id)}
+          >
+            {editingTabId === bill.id ? (
+              <input
+                class="tab-rename-input"
+                value={tabRenameValue}
+                onInput={e => setTabRenameValue((e.target as HTMLInputElement).value)}
+                onKeyDown={e => { if (e.key === 'Enter') finishRename(); if (e.key === 'Escape') setEditingTabId(null) }}
+                onBlur={finishRename}
+                ref={(el: HTMLInputElement | null) => { if (el) { el.focus(); el.select() } }}
+                onClick={e => e.stopPropagation()}
+              />
+            ) : (
+              <span
+                class="tab-name"
+                onDblClick={e => { e.stopPropagation(); setEditingTabId(bill.id); setTabRenameValue(bill.name) }}
+              >
+                {bill.name}
+              </span>
+            )}
+            {multi.bills.length > 1 && (
+              <button
+                class="tab-close"
+                aria-label="Remove bill"
+                onClick={e => { e.stopPropagation(); deleteBill(bill.id) }}
+              >×</button>
+            )}
+          </div>
+        ))}
+        <button class="bill-tab-add" aria-label="Add bill" onClick={addBill}>+</button>
+      </div>
 
       <div class="currency-bar">
         <span class="currency-label">{t('bills.currency')}:</span>

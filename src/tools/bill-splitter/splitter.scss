@@ -232,6 +232,112 @@
   }
 }
 
+// ─── Bill Tabs ────────────────────────────────────────────────────────────────
+
+.bills-tabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 1.25rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+
+  &::-webkit-scrollbar { display: none; }
+
+  .bill-tab {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 10px;
+    border-radius: var(--r-sm);
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    cursor: pointer;
+    white-space: nowrap;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-3);
+    transition: all 150ms ease;
+    flex-shrink: 0;
+    user-select: none;
+
+    &:hover {
+      border-color: var(--border-2);
+      color: var(--text-2);
+    }
+
+    &.active {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-dim);
+      font-weight: 600;
+    }
+
+    .tab-name {
+      max-width: 120px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .tab-close {
+      background: none;
+      border: none;
+      padding: 0 2px;
+      color: var(--text-3);
+      cursor: pointer;
+      font-size: 0.875rem;
+      line-height: 1;
+      border-radius: 2px;
+      transition: all 120ms ease;
+      box-shadow: none;
+      flex-shrink: 0;
+
+      &:hover {
+        color: var(--error);
+        background: var(--error-dim);
+        box-shadow: none;
+      }
+    }
+
+    .tab-rename-input {
+      background: none;
+      border: none;
+      outline: none;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--accent);
+      width: 80px;
+      padding: 0;
+      min-width: 0;
+    }
+  }
+
+  .bill-tab-add {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: var(--r-sm);
+    border: 1.5px dashed var(--border-2);
+    background: none;
+    color: var(--text-3);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 150ms ease;
+    flex-shrink: 0;
+    box-shadow: none;
+
+    &:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-dim);
+      box-shadow: none;
+    }
+  }
+}
+
 .currency-bar {
   display: flex;
   align-items: center;
