@@ -221,10 +221,11 @@ export default function BillSplitter() {
               <input
                 class="tab-rename-input"
                 value={tabRenameValue}
+                autoFocus
+                onFocus={e => (e.target as HTMLInputElement).select()}
                 onInput={e => setTabRenameValue((e.target as HTMLInputElement).value)}
                 onKeyDown={e => { if (e.key === 'Enter') finishRename(); if (e.key === 'Escape') setEditingTabId(null) }}
                 onBlur={finishRename}
-                ref={(el: HTMLInputElement | null) => { if (el) { el.focus(); el.select() } }}
                 onClick={e => e.stopPropagation()}
               />
             ) : (
